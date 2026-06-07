@@ -18,11 +18,11 @@ Each section is its own component under [`components/`](components/), composed b
 | ------- | ---------- | ----- |
 | **Hero** | the pitch + a one-file `cl` / `na` / walker teaser | static |
 | **Fullstack** | one language across the wire | **live** - a guestbook backed by `sign_guestbook` / `get_guestbook` walkers, persisted to a real graph |
-| **Object-Spatial** | the program is a graph; walkers walk it | **live** - renders the actual path the `explore_graph` walker took through the server's graph |
+| **Object-Spatial** | the program is a graph; walkers walk it | **live** - `explore_graph` traverses the **real** graph (root -> every guestbook signature) and the section draws the actual path; no demo data |
 | **AI-native** | a function body delegated to an LLM with `by llm()` | static (code + illustrated call) |
 | **Native** | `jac nacompile` to machine code, no C toolchain | **data** - Jac-vs-Zig FPS bars + screenshots from `capture.jac` |
 | **WebAssembly** | the *same* `na {}` shooter, compiled to wasm | **live** - playable in-browser via a WebGL shim |
-| **littleX** | a whole social app as one `<LittleX/>` component | **live** - the full littleX app (auth/feed/follows/channels/profiles) embedded in an app-window frame; its walkers run in *this* server, persisting to the **same graph** |
+| **littleX** | a whole social app as one `<LittleX/>` component | **live** - the full littleX app (auth/feed/follows/channels/profiles) embedded in an app-window frame; its walkers run in *this* server, persisting to the **same graph**. Below the embed, two smaller side-by-side panels surface server views as components: **`/graph`** (the live Jac Graph Visualizer of the graph littleX writes to) and **`/docs`** (the FastAPI Swagger UI). Also standalone at **`/littlex`** |
 | **Outro** | install + links | static |
 
 The same `na {}` cube-shooter game lives in [`main.jac`](main.jac): the client

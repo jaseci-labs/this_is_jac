@@ -5,12 +5,12 @@ Two demos run against a real persistent graph:
   - **Guestbook** - every signature is a `Visitor` node hung off a root and
     wired with a `Signed` edge. `get_guestbook` fans out across all roots and
     gathers them. Data lives in the graph; it survives restarts.
-  - **Graph traversal** - a small fixed topic graph (`Topic` nodes joined by
-    `Link` edges) that a walker explores, recording the exact order it visited
-    nodes so the client can animate the path the walker took.
+  - **Graph traversal** - `explore_graph` walks the REAL graph from the root,
+    visiting every `Visitor` the guestbook created and recording the order it
+    crossed them, so the client draws the actual live topology (no demo data).
 
 Walkers are the mobile agents the client `root spawn`s. Each declares where it
-starts (`with Root entry`) and how it reacts at each node type (`with Topic
+starts (`with Root entry`) and how it reacts at each node type (`with Visitor
 entry`). Traversal is always `visit`, never a hand-rolled loop.
 """
 
@@ -43,7 +43,6 @@ obj GraphSnapshot {
 
 # ─── Edges: the relationships in the graph ───────────────────────────────────
 edge Signed {}
-edge Link {}
 
 # ─── Nodes: data plus the method that presents it as a view ──────────────────
 node Visitor {
@@ -58,15 +57,6 @@ node Visitor {
             message=self.message,
             created_at=self.created_at
         );
-    }
-}
-
-node Topic {
-    has label: str = "",
-        kind: str = "topic";
-
-    def to_view -> GraphNodeView {
-        return GraphNodeView(id=jid(self), label=self.label, kind=self.kind);
     }
 }
 
@@ -115,67 +105,36 @@ walker:pub get_guestbook {
     }
 }
 
-# ─── Graph-traversal demo ────────────────────────────────────────────────────
-# Build a small, fixed topic graph the first time it is asked for. The shape is
-# hand-wired so the traversal animation is legible: a central `Jac` topic
-# branches into the four pillars, each of which links to a concrete capability.
-def _build_demo_graph(anchor: Topic) -> None {
-    if [anchor-->[?:Topic]] {
-        return;
-    }
-    osp = anchor ++> Topic(label="Object-Spatial", kind="pillar");
-    ai = anchor ++> Topic(label="AI-native", kind="pillar");
-    native = anchor ++> Topic(label="Native", kind="pillar");
-    web = anchor ++> Topic(label="Fullstack", kind="pillar");
-
-    osp[0] ++> Topic(label="walkers", kind="leaf");
-    osp[0] ++> Topic(label="nodes & edges", kind="leaf");
-    ai[0] ++> Topic(label="by llm()", kind="leaf");
-    native[0] ++> Topic(label="wasm", kind="leaf");
-    native[0] ++> Topic(label="machine code", kind="leaf");
-    web[0] ++> Topic(label="one language", kind="leaf");
-}
-
+# ─── Graph traversal (real data) ─────────────────────────────────────────────
+# Walk the real graph from the root: visit every Visitor the guestbook created,
+# recording the visit order + the root->visitor edges, so the OSP section draws
+# the actual live topology. No synthetic/demo nodes.
 walker:pub explore_graph {
-    has nodes: list[GraphNodeView] = [],
+    has rid: str = "",
+        nodes: list[GraphNodeView] = [],
         edges: list[list[str]] = [],
         path: list[str] = [],
         log: list[str] = [],
-        seen: dict[str, bool] = {},
         reports: list[GraphSnapshot] = [];
 
     can run with Root entry {
-        matches = [
-            t
-            for t in [-->[?:Topic]]
-            if t.label == "Jac"
-        ];
-        if matches {
-            anchor = matches[0];
-        } else {
-            anchor = (here ++> Topic(label="Jac", kind="root"))[0];
-        }
-        _build_demo_graph(anchor);
-        self.log.append("walker spawned at Jac");
-        visit [anchor];
+        self.rid = jid(here);
+        self.nodes.append(GraphNodeView(id=self.rid, label="root", kind="root"));
+        self.path.append(self.rid);
+        self.log.append("walker spawned at root");
+        visit [-->[?:Visitor]];
     }
 
-    can walk with Topic entry {
-        tid = jid(here);
-        if tid not in self.seen {
-            self.seen[tid] = True;
-            self.nodes.append(here.to_view());
-            self.path.append(tid);
-            self.log.append("visited " + here.label);
-        }
-        for n in [-->[?:Topic]] {
-            self.edges.append([tid, jid(n)]);
-        }
-        visit [-->[?:Topic]];
+    can walk with Visitor entry {
+        vid = jid(here);
+        self.nodes.append(GraphNodeView(id=vid, label=here.name, kind="visitor"));
+        self.edges.append([self.rid, vid]);
+        self.path.append(vid);
+        self.log.append("visited " + here.name);
     }
 
     can deliver with Root exit {
-        self.log.append("traversal complete: " + str(len(self.path)) + " nodes");
+        self.log.append("traversal complete: " + str(len(self.nodes)) + " nodes");
         report GraphSnapshot(
             nodes=self.nodes, edges=self.edges, path=self.path, log=self.log
         );

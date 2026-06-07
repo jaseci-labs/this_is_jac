@@ -9,6 +9,8 @@ app is one click away at `/littlex`."""
 import from "lucide-react" { AppWindow, ArrowUpRight }
 import from "@jac/runtime" { Link }
 import from .SectionShell { SectionShell }
+import from .GraphView { GraphView }
+import from .DocsView { DocsView }
 import from ..littlex.frontend { app as LittleX }
 
 def:pub LittleXSection -> JsxElement {
@@ -50,6 +52,14 @@ def:pub LittleXSection -> JsxElement {
                 <p className="mt-4 text-center text-sm text-muted-foreground">
                     Sign up inside the frame to try it - your account and posts persist in the shared graph.
                     Or <Link to="/littlex" className="font-medium text-primary hover:underline">open the full app at /littlex</Link>.
+                </p>
+
+                <div className="mt-6 grid gap-4 md:grid-cols-2">
+                    <GraphView/>
+                    <DocsView/>
+                </div>
+                <p className="mt-3 text-center text-xs text-muted-foreground">
+                    Two more server views, side by side: the live graph littleX writes to, and the auto-generated API for every walker.
                 </p>
             </div>
         </SectionShell>;

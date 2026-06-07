@@ -11,33 +11,30 @@ import from .CodeBlock { CodeBlock }
 import from .SectionShell { SectionShell }
 sv import from ..server { GraphSnapshot }
 
-glob _CODE: str = """# Nodes hold data; typed edges are the relationships.
-node Topic { has label: str; }
-edge Link {}
+glob _CODE: str = """# Each guestbook signature is a Visitor node hung off the
+# root by a typed Signed edge - real data, not a fixture.
+node Visitor { has name: str, message: str; }
+edge Signed {}
 
-# A walker starts somewhere and reacts at each node it lands
-# on. Traversal is `visit`, never a hand-rolled loop.
+# The walker starts at the root and reacts at each node it
+# lands on. Traversal is `visit`, never a hand-rolled loop.
 walker:pub explore_graph {
     has path: list[str] = [];
 
     can run with `root entry {
-        visit [-->[?:Topic]];          # step onto the graph
+        visit [-->[?:Visitor]];        # step onto the real graph
     }
-    can walk with Topic entry {
-        self.path.append(here.label);  # record the visit
-        visit [-->[?:Topic]];          # fan out to neighbours
+    can walk with Visitor entry {
+        self.path.append(here.name);   # record the visit
     }
 }""";
 
-"""Fill color for a node by its role in the demo graph."""
+"""Fill color for a node by its role in the real graph."""
 def _node_fill(kind: str) -> str {
     if kind == "root" {
         return "var(--primary)";
     }
-    if kind == "pillar" {
-        return "color-mix(in oklch, var(--primary) 55%, transparent)";
-    }
-    return "var(--muted)";
+    return "color-mix(in oklch, var(--primary) 45%, var(--muted))";
 }
 
 def:pub OspSection(
@@ -50,21 +47,18 @@ def:pub OspSection(
     path = snapshot.path if snapshot else [];
     log = snapshot.log if snapshot else [];
 
-    # Layered layout: root on top, pillars in the middle, leaves on the bottom.
+    # Real layout: the root on top, each visited Visitor (a guestbook
+    # signature) spread along a row beneath it.
     positions: dict[str, dict] = {};
     roots = [n for n in nodes if n.kind == "root"];
-    pillars = [n for n in nodes if n.kind == "pillar"];
-    leaves = [n for n in nodes if n.kind == "leaf"];
+    others = [n for n in nodes if n.kind != "root"];
     for n in roots {
-        positions[n.id] = {"x": 500.0, "y": 58.0};
+        positions[n.id] = {"x": 500.0, "y": 72.0};
     }
-    for (i, n) in enumerate(pillars) {
-        x = 500.0 if len(pillars) <= 1 else 140.0 + i * (720.0 / (len(pillars) - 1));
-        positions[n.id] = {"x": x, "y": 250.0};
-    }
-    for (i, n) in enumerate(leaves) {
-        x = 500.0 if len(leaves) <= 1 else 80.0 + i * (840.0 / (len(leaves) - 1));
-        positions[n.id] = {"x": x, "y": 446.0};
+    cnt = len(others);
+    for (i, n) in enumerate(others) {
+        x = 500.0 if cnt <= 1 else 90.0 + i * (820.0 / (cnt - 1));
+        positions[n.id] = {"x": x, "y": 408.0};
     }
 
     order: dict[str, int] = {};
@@ -85,16 +79,16 @@ def:pub OspSection(
     for n in nodes {
         if n.id in positions {
             p = positions[n.id];
-            label_above = n.kind != "leaf";
+            is_root = n.kind == "root";
             node_items.append(
                 {
                     "x": p["x"],
                     "y": p["y"],
                     "label": n.label,
                     "fill": _node_fill(n.kind),
-                    "r": 24.0 if n.kind == "root" else (20.0 if n.kind == "pillar" else 15.0),
+                    "r": 26.0 if is_root else 16.0,
                     "ord": str(order[n.id]) if n.id in order else "",
-                    "ly": (p["y"] - 32.0) if label_above else (p["y"] + 30.0)
+                    "ly": (p["y"] + 44.0) if is_root else (p["y"] + 32.0)
                 }
             );
         }
@@ -105,7 +99,7 @@ def:pub OspSection(
             id="osp"
             eyebrow="Object-Spatial"
             title="The program is a graph; walkers walk it"
-            subtitle="Data lives in nodes joined by typed edges. Logic rides on walkers that move through the topology. The graph on the right is the live output of a walker that just traversed the server's graph."
+            subtitle="Data lives in nodes joined by typed edges; logic rides on walkers that move through the topology. The graph on the right is real - the walker just traversed this server's graph, one node per guestbook signature above."
         >
             <div className="grid items-start gap-8 lg:grid-cols-2">
                 <CodeBlock code={_CODE} filename="server.jac"/>
@@ -185,6 +179,15 @@ def:pub OspSection(
                                 {" → ".join(log) if log else "spawn the walker to trace its path"}
                             </span>
                         </div>
+                        {if len(node_items) <= 1 {
+                            <div className="rounded-lg border border-border bg-background/50 p-3 text-xs text-muted-foreground">
+                                Just the root so far.{" "}
+                                <a href="#fullstack" className="font-medium text-primary hover:underline">
+                                    Sign the guestbook
+                                </a>
+                                {" "}above, then re-spawn the walker to watch the graph grow.
+                            </div>
+                        }}
                     </CardContent>
                 </Card>
             </div>
