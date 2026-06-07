@@ -71,11 +71,12 @@ jac run capture.jac --skip-shots    # benchmark only
 jac run capture.jac --skip-bench    # screenshots only
 ```
 
-1. **Benchmark** - runs `raylib_shooter/demo.sh --bench` (first run downloads the
-   Zig toolchain + precompiled raylib and builds both binaries), parses the
-   Jac-vs-Zig avg/max FPS table, and writes `assets/captures/benchmark.json`.
-   The Native section fetches it at runtime; a representative fallback is
-   committed so the page is complete before any capture run.
+1. **Benchmark** - runs `raylib_shooter/bench.jac` (a pure-Jac orchestrator;
+   first run downloads precompiled raylib + the Zig toolchain + the Zig twin's
+   source and builds both binaries), reads the Jac-vs-Zig avg/max FPS, and writes
+   `assets/captures/benchmark.json`. The Native section fetches it at runtime; a
+   representative fallback is committed so the page is complete before any
+   capture run.
 2. **Screenshots** - launches the freshly-built native binaries and grabs their
    window with ImageMagick `import` into `shooter_jac.png` / `shooter_zig.png`.
    Needs an **X display**: blank grabs (e.g. pure-Wayland boxes, where the GL
@@ -92,5 +93,5 @@ git-ignored.
 
 - `jac` with the `jac-client` plugin (this repo's `.venv`, or `pip install jaclang jac-client`).
 - For `capture.jac`: `bash`, `curl`, ImageMagick (`import` / `convert` / `identify`);
-  the benchmark also needs the Zig toolchain (auto-downloaded by `demo.sh`) and a
-  GL-capable display. Screenshots additionally need an X11 display.
+  the benchmark also needs a GL-capable display (the Zig toolchain + Zig source
+  are auto-downloaded by `bench.jac`). Screenshots additionally need an X11 display.

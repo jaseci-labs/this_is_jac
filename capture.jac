@@ -24,6 +24,7 @@ import os;
 import sys;
 import json;
 import time;
+import shutil;
 import subprocess;
 import datetime;
 
@@ -36,13 +37,13 @@ benchmark/screenshot steps then skip cleanly."""
 def _find_shooter_dir -> str {
     d = HERE;
     for _i in range(10) {
-        in_repo = os.path.join(d, "jac", "examples", "raylib_shooter");
-        if os.path.exists(os.path.join(in_repo, "demo.sh")) {
-            return in_repo;
-        }
         sibling = os.path.join(d, "raylib_shooter");
-        if os.path.exists(os.path.join(sibling, "demo.sh")) {
+        if os.path.exists(os.path.join(sibling, "bench.jac")) {
             return sibling;
+        }
+        in_repo = os.path.join(d, "jac", "examples", "raylib_shooter");
+        if os.path.exists(os.path.join(in_repo, "bench.jac")) {
+            return in_repo;
         }
         parent = os.path.dirname(d);
         if parent == d {
@@ -75,21 +76,29 @@ def _platform -> str {
     }
 }
 
-"""Pull one ('Jac'|'Zig') row out of demo.sh's benchmark table.
+"""Resolve the `jac` CLI (PATH, then the active venv's bin) to run bench.jac."""
+def _jac_exe -> str {
+    found = shutil.which("jac");
+    if found {
+        return found;
+    }
+    cand = os.path.join(sys.prefix, "bin", "jac");
+    if os.path.exists(cand) {
+        return cand;
+    }
+    return "jac";
+}
 
-Rows look like:  `  Jac            461.7          719.9         3694`
-An unavailable build prints `n/a` cells; those parse to None."""
-def _parse_row(text: str, label: str) -> dict | None {
+"""Extract the `BENCH_JSON {...}` payload emitted by `bench.jac --json`
+(returns the decoded dict, or None if absent)."""
+def _parse_bench_json(text: str) -> any {
+    marker = "BENCH_JSON ";
     for line in text.splitlines() {
-        parts = line.split();
-        if len(parts) >= 4 and parts[0] == label {
+        s = line.strip();
+        if s.startswith(marker) {
             try {
-                return {
-                    "avg": float(parts[1]),
-                    "max": float(parts[2]),
-                    "frames": int(parts[3])
-                };
-            } except ValueError as e {
+                return json.loads(s[len(marker):]);
+            } except Exception as e {
                 return None;
             }
         }
@@ -113,15 +122,15 @@ obj CaptureRunner {
             self.record("benchmark", "fail", "raylib_shooter example not found (walked up from script dir)");
             return;
         }
-        demo = os.path.join(SHOOTER_DIR, "demo.sh");
-        if not os.path.exists(demo) {
-            self.record("benchmark", "fail", f"demo.sh not found at {demo}");
+        bench = os.path.join(SHOOTER_DIR, "bench.jac");
+        if not os.path.exists(bench) {
+            self.record("benchmark", "fail", f"bench.jac not found at {bench}");
             return;
         }
-        print(">> running raylib shooter benchmark (builds both binaries, ~8s each)...");
+        print(">> benchmarking via bench.jac (downloads raylib/zig + builds both, ~8s each)...");
         try {
             proc = subprocess.run(
-                ["bash", demo, "--bench"],
+                [_jac_exe(), "run", bench, "--json"],
                 cwd=SHOOTER_DIR,
                 capture_output=True,
                 text=True,
@@ -135,26 +144,25 @@ obj CaptureRunner {
             return;
         }
         out = proc.stdout + "\n" + proc.stderr;
-        jac = _parse_row(out, "Jac");
-        zig = _parse_row(out, "Zig");
-        if jac is None and zig is None {
-            tail = "\n".join(out.strip().splitlines()[-6:]);
-            self.record("benchmark", "fail", "could not parse FPS table (no display/GPU?)");
+        parsed = _parse_bench_json(out);
+        if parsed is None {
+            tail = "\n".join(out.strip().splitlines()[-8:]);
+            self.record("benchmark", "fail", "no BENCH_JSON from bench.jac (no display/GPU?)");
             print(f"     --- last output ---\n{tail}");
             return;
         }
         data = {
             "captured_at": _today(),
             "platform": _platform(),
-            "note": "Measured by capture.jac",
-            "jac": jac if jac else {"avg": 0.0, "max": 0.0, "frames": 0},
-            "zig": zig if zig else {"avg": 0.0, "max": 0.0, "frames": 0}
+            "note": "Measured by capture.jac via bench.jac",
+            "jac": parsed["jac"],
+            "zig": parsed["zig"]
         };
         with open(os.path.join(CAPTURES, "benchmark.json"), "w") as f {
             json.dump(data, f, indent=2);
         }
-        ja = data["jac"]["avg"];
-        za = data["zig"]["avg"];
+        ja = parsed["jac"]["avg"];
+        za = parsed["zig"]["avg"];
         self.record("benchmark", "ok", f"Jac {ja} / Zig {za} avg fps -> benchmark.json");
     }
 
