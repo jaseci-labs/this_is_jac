@@ -26,6 +26,9 @@
     --ring: oklch(0.705 0.213 47.604);
     --jac: oklch(0.705 0.213 47.604);
     --jac-2: oklch(0.78 0.16 75);
+    --like: oklch(0.65 0.24 357);
+    --reply: oklch(0.68 0.16 237);
+    --repost: oklch(0.72 0.18 152);
     --chart-1: oklch(0.837 0.128 66.29);
     --chart-2: oklch(0.705 0.213 47.604);
     --chart-3: oklch(0.646 0.222 41.116);
@@ -55,6 +58,9 @@
     --ring: oklch(0.705 0.213 47.604);
     --jac: oklch(0.705 0.213 47.604);
     --jac-2: oklch(0.82 0.16 78);
+    --like: oklch(0.68 0.25 357);
+    --reply: oklch(0.7 0.16 237);
+    --repost: oklch(0.74 0.18 152);
     --chart-1: oklch(0.837 0.128 66.29);
     --chart-2: oklch(0.705 0.213 47.604);
     --chart-3: oklch(0.646 0.222 41.116);
@@ -69,6 +75,9 @@
     --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
     --color-jac: var(--jac);
     --color-jac-2: var(--jac-2);
+    --color-like: var(--like);
+    --color-reply: var(--reply);
+    --color-repost: var(--repost);
     --color-chart-5: var(--chart-5);
     --color-chart-4: var(--chart-4);
     --color-chart-3: var(--chart-3);
@@ -164,3 +173,28 @@
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: oklch(1 0 0 / 0.1); border-radius: 8px; }
 ::-webkit-scrollbar-thumb:hover { background: oklch(1 0 0 / 0.18); }
+
+/* ── littleX (embedded app) flourishes ───────────────────────────────── */
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse-dot {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+.lx-fade-up { animation: fadeUp 0.3s ease both; }
+.lx-pulse { animation: pulse-dot 1.2s ease-in-out infinite; }
+
+.lx-char-ring { width: 22px; height: 22px; flex-shrink: 0; }
+.lx-char-ring-bg { fill: none; stroke: var(--border); stroke-width: 2.5; }
+.lx-char-ring-fill {
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    transform: rotate(-90deg);
+    transform-origin: 12px 12px;
+    transition: stroke-dashoffset 0.12s ease, stroke 0.2s ease;
+}

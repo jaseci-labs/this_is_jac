@@ -31,8 +31,7 @@ def:pub NativeSection -> JsxElement {
         zigMax: float = 719.1,
         zigFrames: int = 3764,
         capturedAt: str = "",
-        jacShotOk: bool = True,
-        zigShotOk: bool = True;
+        jacShotOk: bool = True;
 
     can with entry {
         loadBench();
@@ -111,45 +110,26 @@ def:pub NativeSection -> JsxElement {
                 </Card>
             </div>
 
-            <div className="mt-8 grid gap-4 sm:grid-cols-2">
-                {[
-                    <div
-                        key={shot["label"]}
-                        className="overflow-hidden rounded-xl border border-border bg-[#0b0e16]"
-                    >
-                        <div className="flex items-center gap-2 border-b border-border/60 px-4 py-2 text-xs text-muted-foreground">
-                            <Camera size={13}/>
-                            {shot["label"]}
-                        </div>
-                        {if shot["ok"] {
-                            <img
-                                src={shot["src"]}
-                                alt={shot["label"]}
-                                className="aspect-[16/10] w-full object-cover"
-                                onError={shot["onErr"]}
-                            />
-                        } else {
-                            <div className="flex aspect-[16/10] w-full flex-col items-center justify-center gap-2 text-muted-foreground">
-                                <Camera size={24} className="opacity-40"/>
-                                <span className="text-xs">run capture.jac to add a screenshot</span>
-                            </div>
-                        } }
+            <div className="mt-8">
+                <div className="mx-auto max-w-2xl overflow-hidden rounded-xl border border-border bg-[#0b0e16]">
+                    <div className="flex items-center gap-2 border-b border-border/60 px-4 py-2 text-xs text-muted-foreground">
+                        <Camera size={13}/>
+                        raylib cube shooter - Jac native (jac nacompile), captured by the engine itself
                     </div>
-                    for shot in [
-                        {
-                            "label": "Jac native",
-                            "src": "/static/captures/shooter_jac.png",
-                            "ok": jacShotOk,
-                            "onErr": lambda { jacShotOk = False; }
-                        },
-                        {
-                            "label": "Zig native",
-                            "src": "/static/captures/shooter_zig.png",
-                            "ok": zigShotOk,
-                            "onErr": lambda { zigShotOk = False; }
-                        }
-                    ]
-                ]}
+                    {if jacShotOk {
+                        <img
+                            src="/static/captures/shooter_jac.png"
+                            alt="Jac native raylib cube shooter"
+                            className="aspect-[16/10] w-full object-cover"
+                            onError={lambda { jacShotOk = False; }}
+                        />
+                    } else {
+                        <div className="flex aspect-[16/10] w-full flex-col items-center justify-center gap-2 text-muted-foreground">
+                            <Camera size={24} className="opacity-40"/>
+                            <span className="text-xs">run capture.jac to add a screenshot</span>
+                        </div>
+                    } }
+                </div>
             </div>
         </SectionShell>;
 }

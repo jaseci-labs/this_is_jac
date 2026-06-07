@@ -3,13 +3,13 @@
   "platform": "Linux x86_64",
   "note": "Measured by capture.jac via bench.jac",
   "jac": {
-    "avg": 754.292914,
-    "max": 905.619936,
-    "frames": 6035
+    "avg": 781.678441,
+    "max": 980.418149,
+    "frames": 6254
   },
   "zig": {
-    "avg": 750.124117,
-    "max": 941.249951,
-    "frames": 6001
+    "avg": 774.35034,
+    "max": 944.867039,
+    "frames": 6195
   }
 }

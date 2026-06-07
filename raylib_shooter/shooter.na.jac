@@ -46,7 +46,9 @@ import from raylib {
         fileName: str
     ) -> bool;  def LoadFileText(fileName: str) -> str;  def TextToInteger(
         text: str
-    ) -> i32;  def SaveFileText(fileName: str, text: str) -> bool;
+    ) -> i32;  def SaveFileText(fileName: str, text: str) -> bool;  def TakeScreenshot(
+        fileName: str
+    ) -> None;
 }
 
 glob RL_MODELVIEW: int = 0x1700,
@@ -296,9 +298,31 @@ def write_bench_result(
     );
 }
 
+"""Screenshot warmup frame, or 0 for none. `capture.jac` writes the frame number
+to capture into a sibling `.screenshot` file before launching; when that file is
+absent this returns 0 and the self-screenshot path stays dormant (every normal
+run). raylib's `TakeScreenshot` reads the GL framebuffer directly, so it works
+on any display server - no external X11/Wayland window grab needed."""
+def shot_frames -> int {
+    if not FileExists(".screenshot") {
+        return 0;
+    }
+    # NOTE: avoid a ternary here - `n` is i32 (TextToInteger) and a literal like
+    # 60 is i64, and the native backend misplaces the width-widening zext around
+    # the ternary's PHI ("PHI nodes not grouped at top of basic block"). An
+    # explicit if/return sidesteps the merge block entirely.
+    n = TextToInteger(LoadFileText(".screenshot"));
+    if n > 0 {
+        return n;
+    }
+    return 60;
+}
+
 """Benchmark accumulators. `bench` is the requested duration (0 = interactive),
-resolved once at startup; `frames`/`max_fps` are tallied across the run."""
+resolved once at startup; `frames`/`max_fps` are tallied across the run. `shot`
+is the screenshot warmup frame (0 = dormant)."""
 glob bench: float = bench_seconds(),
+     shot: int = shot_frames(),
      frames: int = 0,
      max_fps: float = 0.0;
 
@@ -605,6 +629,13 @@ with entry {
         end_camera(960.0, 600.0);
         draw_fps(10, 10);
         end_frame();
+
+        # Self-screenshot path (dormant unless `.screenshot` exists): grab the
+        # presented frame after EndDrawing, then exit.
+        if shot > 0 and frames >= shot {
+            TakeScreenshot("shooter_shot.png");
+            break;
+        }
 
         if bench > 0.0 and clock() >= bench {
             break;

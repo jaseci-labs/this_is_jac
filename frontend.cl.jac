@@ -21,10 +21,32 @@ import from .components.OspSection { OspSection }
 import from .components.ByllmSection { ByllmSection }
 import from .components.NativeSection { NativeSection }
 import from .components.WasmShooterSection { WasmShooterSection }
+import from .components.LittleXSection { LittleXSection }
 import from .components.OutroSection { OutroSection }
+import from "@jac/runtime" { Router, Routes, Route }
+import from .littlex.frontend { app as LittleX }
 import "./global.css";
 
+# Top-level router: the scroll showcase at `/`, and the full littleX app
+# (the same `<LittleX/>` the section embeds) standalone at `/littlex`.
 def:pub app -> JsxElement {
+    return
+        <Router>
+            <Routes>
+                <Route
+                    path="/littlex"
+                    element={
+                        <div className="h-screen overflow-hidden bg-background text-foreground">
+                            <LittleX/>
+                        </div>
+                    }
+                />
+                <Route path="/*" element={<Showcase/>}/>
+            </Routes>
+        </Router>;
+}
+
+def:pub Showcase -> JsxElement {
     has darkMode: bool = True,
         guestbook: list[GuestEntry] = [],
         gbName: str = "",
@@ -67,6 +89,7 @@ def:pub app -> JsxElement {
                 <ByllmSection/>
                 <NativeSection/>
                 <WasmShooterSection/>
+                <LittleXSection/>
                 <OutroSection/>
             </main>
         </div>;

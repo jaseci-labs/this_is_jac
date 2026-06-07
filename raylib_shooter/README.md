@@ -6,7 +6,7 @@ in Jac - there is **no shell script and no committed Zig source** in this repo.
 
 | File | Role |
 | ---- | ---- |
-| `shooter.na.jac` | the game: raylib FFI bindings + the scalar `rlgl` render loop, compiled to a native binary by `jac nacompile` (pure-Python linker, no `cc`/`ld`) |
+| `shooter.na.jac` | the game: raylib FFI bindings + the scalar `rlgl` render loop, compiled to a native binary by `jac nacompile` (pure-Python linker, no `cc`/`ld`). Has two dormant paths gated by sentinel files: a benchmark (`.bench_seconds`) and a self-screenshot (`.screenshot` → raylib `TakeScreenshot`) |
 | `bench.jac` | pure-Jac benchmark orchestrator (replaces the original `demo.sh`) |
 | `web/` | the same game as an `na{}`→WebAssembly + `cl{}` WebGL build (`jac start`) |
 

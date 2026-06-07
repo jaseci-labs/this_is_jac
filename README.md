@@ -22,6 +22,7 @@ Each section is its own component under [`components/`](components/), composed b
 | **AI-native** | a function body delegated to an LLM with `by llm()` | static (code + illustrated call) |
 | **Native** | `jac nacompile` to machine code, no C toolchain | **data** - Jac-vs-Zig FPS bars + screenshots from `capture.jac` |
 | **WebAssembly** | the *same* `na {}` shooter, compiled to wasm | **live** - playable in-browser via a WebGL shim |
+| **littleX** | a whole social app as one `<LittleX/>` component | **live** - the full littleX app (auth/feed/follows/channels/profiles) embedded in an app-window frame; its walkers run in *this* server, persisting to the **same graph** |
 | **Outro** | install + links | static |
 
 The same `na {}` cube-shooter game lives in [`main.jac`](main.jac): the client
@@ -55,6 +56,9 @@ components/           Nav, SectionShell, CodeBlock, StatBar + one file per secti
 components/ui/         shadcn primitives (button, card, badge, ...)
 assets/captures/      benchmark.json + shooter screenshots (refreshed by capture.jac)
 raylib_shooter/       the bundled native demo capture.jac benchmarks + screenshots
+littlex/              the bundled littleX app (frontend + social_graph.jac + components);
+                      its `app` is embedded by the littleX section, its walkers share
+                      this server's graph
 ```
 
 ## The capture script (`capture.jac`)
@@ -77,21 +81,23 @@ jac run capture.jac --skip-bench    # screenshots only
    `assets/captures/benchmark.json`. The Native section fetches it at runtime; a
    representative fallback is committed so the page is complete before any
    capture run.
-2. **Screenshots** - launches the freshly-built native binaries and grabs their
-   window with ImageMagick `import` into `shooter_jac.png` / `shooter_zig.png`.
-   Needs an **X display**: blank grabs (e.g. pure-Wayland boxes, where the GL
-   window is invisible to `import`) are detected and skipped, and the Native
-   section falls back to a placeholder. The live WebAssembly section still
-   renders the game regardless.
+2. **Screenshot** - the Jac shooter screenshots *itself*: `capture.jac` writes a
+   `.screenshot` sentinel, the binary renders a few frames and calls raylib's own
+   `TakeScreenshot` (reading its GL framebuffer directly), then exits, and the PNG
+   is moved to `assets/captures/shooter_jac.png`. No external window grab. If the
+   frame comes back blank - e.g. **WSLg/llvmpipe**, where the GL buffer can't be
+   read back by *any* tool - it's detected and skipped, keeping the committed
+   image; on a normal display it captures a real native frame.
 3. **Manifest** - `manifest.json` records what each step did, with timestamps.
 
-`benchmark.json` and the shooter screenshots are committed as representative
-artifacts (re-run `capture.jac` to refresh them); only `manifest.json` is
-git-ignored.
+`benchmark.json` and `shooter_jac.png` are committed as representative artifacts
+(re-run `capture.jac` to refresh them); only `manifest.json` is git-ignored.
 
 ## Requirements
 
 - `jac` with the `jac-client` plugin (this repo's `.venv`, or `pip install jaclang jac-client`).
-- For `capture.jac`: `bash`, `curl`, ImageMagick (`import` / `convert` / `identify`);
-  the benchmark also needs a GL-capable display (the Zig toolchain + Zig source
-  are auto-downloaded by `bench.jac`). Screenshots additionally need an X11 display.
+- For `capture.jac`: network access on first run + a GL-capable display (the
+  benchmark builds + runs both binaries; the Zig toolchain and Zig source are
+  auto-downloaded by `bench.jac`). The screenshot is written by the engine itself
+  - no ImageMagick needed to capture; `identify`, if present, is used only as a
+  best-effort blank-frame guard.

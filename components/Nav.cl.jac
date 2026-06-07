@@ -10,7 +10,8 @@ glob _LINKS: list[dict] = [
     {"href": "#osp", "label": "Object-Spatial"},
     {"href": "#ai", "label": "AI-native"},
     {"href": "#native", "label": "Native"},
-    {"href": "#wasm", "label": "WebAssembly"}
+    {"href": "#wasm", "label": "WebAssembly"},
+    {"href": "#littlex", "label": "littleX"}
 ];
 
 def:pub Nav(darkMode: bool, onToggleTheme: Callable[[], None]) -> JsxElement {

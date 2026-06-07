@@ -166,133 +166,81 @@ obj CaptureRunner {
         self.record("benchmark", "ok", f"Jac {ja} / Zig {za} avg fps -> benchmark.json");
     }
 
-    # ── 2. Screenshots (best-effort) ──────────────────────────────────────────
-    def _find_window(title: str) -> str {
-        try {
-            r = subprocess.run(
-                ["xwininfo", "-root", "-tree"],
-                capture_output=True, text=True, timeout=15
-            );
-            for line in r.stdout.splitlines() {
-                if title in line {
-                    parts = line.strip().split();
-                    if parts and parts[0].startswith("0x") {
-                        return parts[0];
-                    }
-                }
-            }
-        } except Exception as e {
-            return "";
-        }
-        return "";
-    }
-
-    """A grab that comes back with almost no distinct colors is a blank
-    XWayland-root capture (the game renders on Wayland, invisible to `import`),
-    not a real frame. The shooter scene - grid, shaded cubes, bullets, FPS
-    text - always has far more than this."""
+    # ── 2. Screenshot (via the shooter's own raylib TakeScreenshot) ───────────
+    """A frame with almost no distinct colors means the GL framebuffer couldn't
+    be read (e.g. WSLg/llvmpipe, where neither an external grab nor glReadPixels
+    sees the rendered surface). A real shooter frame - grid + shaded cubes + FPS
+    text - has far more. Best-effort: with no `identify` available we accept it."""
     def _looks_blank(path: str) -> bool {
         try {
             r = subprocess.run(
                 ["identify", "-format", "%k", path],
                 capture_output=True, text=True, timeout=15
             );
-            return int(r.stdout.strip()) < 16;
+            return int(r.stdout.strip()) < 32;
         } except Exception as e {
             return False;
         }
     }
 
-    def _grab(title: str, out: str) -> bool {
-        got = False;
-        # Prefer grabbing the specific window by id (clean, no desktop chrome).
-        wid = self._find_window(title);
-        if wid {
-            r = subprocess.run(
-                ["import", "-window", wid, out], capture_output=True, timeout=25
-            );
-            got = r.returncode == 0 and os.path.exists(out);
-        }
-        # Fallback: grab the root and center-crop to the window size.
-        if not got {
-            r = subprocess.run(
-                ["import", "-window", "root", out], capture_output=True, timeout=25
-            );
-            if r.returncode == 0 and os.path.exists(out) {
-                subprocess.run(
-                    ["convert", out, "-gravity", "center", "-crop", "960x600+0+0", "+repage", out],
-                    capture_output=True
-                );
-                got = True;
-            }
-        }
-        if not got {
-            return False;
-        }
-        if self._looks_blank(out) {
-            if os.path.exists(out) {
-                os.remove(out);
-            }
-            return False;
-        }
-        self._postprocess(out);
-        return True;
-    }
-
-    def _postprocess(out: str) -> None {
-        subprocess.run(
-            ["convert", out, "-resize", "960x600>", "-strip", out],
-            capture_output=True
-        );
-    }
-
-    def capture_one(binary: str, title: str, outname: str) -> None {
-        bin_path = os.path.join(SHOOTER_DIR, binary);
-        if not os.path.exists(bin_path) {
-            self.record(
-                outname, "skip", f"{binary} not built (run benchmark first)"
-            );
+    """Drive the shooter's dormant self-screenshot path: write the warmup frame
+    into `.screenshot`, run the (already-built) binary - which renders, calls
+    raylib's `TakeScreenshot`, and exits - then move the PNG into assets/captures/.
+    The engine writes the PNG from its own GL framebuffer, so this needs no
+    external window grab and works on any display server that can actually read
+    that buffer back."""
+    def capture_self(outname: str) -> None {
+        if not SHOOTER_DIR {
+            self.record(outname, "skip", "raylib_shooter not found");
             return;
         }
-        # Make sure the dormant benchmark path stays off so the binary plays
-        # interactively (and does not self-exit) while we grab a frame.
+        bin_path = os.path.join(SHOOTER_DIR, "shooter");
+        if not os.path.exists(bin_path) {
+            self.record(outname, "skip", "shooter not built (run without --skip-bench first)");
+            return;
+        }
+        shot_file = os.path.join(SHOOTER_DIR, ".screenshot");
         bench_file = os.path.join(SHOOTER_DIR, ".bench_seconds");
+        produced = os.path.join(SHOOTER_DIR, "shooter_shot.png");
         if os.path.exists(bench_file) {
             os.remove(bench_file);
         }
-        proc = subprocess.Popen(
-            [bin_path], cwd=SHOOTER_DIR,
-            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
-        );
+        if os.path.exists(produced) {
+            os.remove(produced);
+        }
+        with open(shot_file, "w") as f {
+            f.write("60");
+        }
         try {
-            time.sleep(3.5);
-            if proc.poll() is not None {
-                self.record(outname, "skip", "binary exited early (no display/GL)");
-                return;
-            }
-            out = os.path.join(CAPTURES, outname);
-            if self._grab(title, out) {
-                kb = os.path.getsize(out) // 1024;
-                self.record(outname, "ok", f"{outname} ({kb} KB)");
-            } else {
-                self.record(outname, "skip", "no X window grab (headless/Wayland)");
-            }
+            subprocess.run(
+                [bin_path], cwd=SHOOTER_DIR,
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                timeout=60
+            );
         } except Exception as e {
             self.record(outname, "fail", f"{e}");
-        } finally {
-            proc.terminate();
-            try {
-                proc.wait(timeout=5);
-            } except Exception as e {
-                proc.kill();
-            }
         }
+        if os.path.exists(shot_file) {
+            os.remove(shot_file);
+        }
+        if not os.path.exists(produced) {
+            self.record(outname, "skip", "binary produced no screenshot (no display/GL)");
+            return;
+        }
+        if self._looks_blank(produced) {
+            os.remove(produced);
+            self.record(outname, "skip", "blank frame (GL buffer unreadable, e.g. WSLg) - kept existing image");
+            return;
+        }
+        dst = os.path.join(CAPTURES, outname);
+        shutil.move(produced, dst);
+        kb = os.path.getsize(dst) // 1024;
+        self.record(outname, "ok", f"{outname} ({kb} KB) via in-engine TakeScreenshot");
     }
 
     def capture_screenshots -> None {
-        print(">> capturing native shooter screenshots (best-effort)...");
-        self.capture_one("shooter", "Jac Cube Shooter", "shooter_jac.png");
-        self.capture_one("shooter_zig", "Jac Cube Shooter", "shooter_zig.png");
+        print(">> capturing native shooter screenshot via the engine's TakeScreenshot...");
+        self.capture_self("shooter_jac.png");
     }
 
     # ── 3. Manifest + summary ──────────────────────────────────────────────────
