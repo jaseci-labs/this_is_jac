@@ -5,7 +5,7 @@ One module, three worlds:
   - `na {}` is the SAME rlgl cube shooter as `raylib_shooter/`, compiled to
     `/static/main.wasm` by the client build and rendered live in the browser by
     `WasmShooterSection` via the WebGL shim in `raylib_shim.cl.jac`.
-  - `server.jac` (imported by the frontend with `sv import`) is the live
+  - `guestbook.jac` (imported by the frontend with `sv import`) is the live
     object-spatial backend behind the guestbook + graph-traversal demos.
 """
 

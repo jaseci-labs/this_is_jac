@@ -1,6 +1,6 @@
 """This is Jac - frontend handler implementations.
 
-Each handler spawns a `server.jac` walker on the graph (`root spawn ...`) and
+Each handler spawns a `guestbook.jac` walker on the graph (`root spawn ...`) and
 folds its `reports` back into client state. Identical call shape to the server
 - no fetch, no client SDK, no serializers."""
 

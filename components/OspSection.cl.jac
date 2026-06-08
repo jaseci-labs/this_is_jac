@@ -1,6 +1,6 @@
 """Object-Spatial section: the program is a graph and the walker is the agent
 that moves through it. The right panel renders the LIVE result of the
-`explore_graph` walker in `server.jac` - the actual nodes it visited, the edges
+`explore_graph` walker in `guestbook.jac` - the actual nodes it visited, the edges
 it crossed, and the order it crossed them (the numbered badges), plus the
 walker's own log. Hit re-run to spawn it again."""
 
@@ -9,7 +9,7 @@ import from .ui.card { Card, CardContent }
 import from .ui.button { Button }
 import from .CodeBlock { CodeBlock }
 import from .SectionShell { SectionShell }
-sv import from ..server { GraphSnapshot }
+sv import from ..guestbook { GraphSnapshot }
 
 glob _CODE: str = """# Signatures are grouped by date: root -> Day -> Visitor,
 # all real graph data, not a fixture.
@@ -123,7 +123,7 @@ def:pub OspSection(
             subtitle="Data lives in nodes joined by typed edges; logic rides on walkers that move through the topology. The graph on the right is real - the walker just traversed this server's graph: each guestbook signature above, grouped under the day it was signed."
         >
             <div className="grid items-start gap-8 lg:grid-cols-2">
-                <CodeBlock code={_CODE} filename="server.jac"/>
+                <CodeBlock code={_CODE} filename="guestbook.jac"/>
 
                 <Card className="border-border bg-card/60">
                     <CardContent className="flex flex-col gap-4 p-6">

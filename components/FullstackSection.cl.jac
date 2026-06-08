@@ -1,6 +1,6 @@
 """Fullstack section: one language across the wire. The left panel is the real
 server + client code; the right panel is a LIVE guestbook backed by the
-`sign_guestbook` / `get_guestbook` walkers in `server.jac`. What you type is a
+`sign_guestbook` / `get_guestbook` walkers in `guestbook.jac`. What you type is a
 node written into a persistent graph and read back by a walker."""
 
 import from "lucide-react" { Send, MessageSquare, Database }
@@ -13,9 +13,9 @@ import from .ui.badge { Badge }
 import from .CodeBlock { CodeBlock }
 import from .GraphView { GraphView }
 import from .SectionShell { SectionShell }
-sv import from ..server { GuestEntry }
+sv import from ..guestbook { GuestEntry }
 
-glob _CODE: str = """# server.jac - a walker IS the endpoint. No routes, no
+glob _CODE: str = """# guestbook.jac - a walker IS the endpoint. No routes, no
 # controllers; spawning it on the graph runs it server-side.
 walker:pub sign_guestbook {
     has name: str, message: str;
@@ -32,7 +32,7 @@ walker:pub sign_guestbook {
 }
 
 # frontend.cl.jac - the SAME types, called from the browser.
-sv import from .server { sign_guestbook }
+sv import from .guestbook { sign_guestbook }
 
 impl app.sign {
     root spawn sign_guestbook(name=self.name, msg=self.msg);
@@ -123,7 +123,7 @@ def:pub FullstackSection(
                     </CardContent>
                 </Card>
 
-                <CodeBlock code={_CODE} filename="server.jac + frontend.cl.jac"/>
+                <CodeBlock code={_CODE} filename="guestbook.jac + frontend.cl.jac"/>
             </div>
             <div className="mt-8">
                 <GraphView refreshKey={graphRefresh}/>

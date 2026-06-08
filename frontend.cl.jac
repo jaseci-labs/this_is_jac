@@ -2,13 +2,13 @@
 
 Owns the shared client state and the server-walker handlers, then composes the
 scroll-driven showcase from the section components in `components/`. The
-guestbook and graph-traversal sections are wired to live `server.jac` walkers;
+guestbook and graph-traversal sections are wired to live `guestbook.jac` walkers;
 the rest pair real Jac source with captured or in-browser demos. Handler bodies
 live in `frontend.impl.jac`.
 """
 
-sv import from .server { sign_guestbook, get_guestbook, explore_graph }
-sv import from .server { GuestEntry, GraphSnapshot }
+sv import from .guestbook { sign_guestbook, get_guestbook, explore_graph }
+sv import from .guestbook { GuestEntry, GraphSnapshot }
 
 import from .components.Nav { Nav }
 import from .components.HeroSection { HeroSection }
@@ -76,8 +76,6 @@ def:pub Showcase -> JsxElement {
                 <HeroSection/>
                 <InteropSection/>
                 <LittleXSection/>
-                <NativeSection/>
-                <WasmShooterSection/>
                 <FullstackSection
                     entries={guestbook}
                     name={gbName}
@@ -88,6 +86,8 @@ def:pub Showcase -> JsxElement {
                     signing={gbSigning}
                     graphRefresh={graphNonce}
                 />
+                <NativeSection/>
+                <WasmShooterSection/>
                 <OspSection {snapshot} {exploring} onExplore={runExplore}/>
                 <ByllmSection/>
                 <OutroSection/>
