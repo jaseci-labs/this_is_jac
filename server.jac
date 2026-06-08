@@ -2,11 +2,12 @@
 
 Two demos run against a real persistent graph:
 
-  - **Guestbook** - every signature is a `Visitor` node hung off a root and
-    wired with a `Signed` edge. `get_guestbook` fans out across all roots and
-    gathers them. Data lives in the graph; it survives restarts.
+  - **Guestbook** - every signature is a `Visitor` node grouped under a `Day`
+    node for the date it was signed: `root -> Day -> Visitor`. `get_guestbook`
+    fans out across all roots, descends each day, and gathers them. Data lives
+    in the graph; it survives restarts.
   - **Graph traversal** - `explore_graph` walks the REAL graph from the root,
-    visiting every `Visitor` the guestbook created and recording the order it
+    crossing each `Day` and the `Visitor`s under it, recording the order it
     crossed them, so the client draws the actual live topology (no demo data).
 
 Walkers are the mobile agents the client `root spawn`s. Each declares where it
@@ -18,6 +19,10 @@ import datetime;
 
 def _now -> str {
     return datetime.datetime.now(datetime.UTC).replace(tzinfo=None).isoformat() + "Z";
+}
+
+def _today -> str {
+    return datetime.datetime.now(datetime.UTC).date().isoformat();
 }
 
 # ─── View models: the typed contract handed back to the client ───────────────
@@ -42,9 +47,17 @@ obj GraphSnapshot {
 }
 
 # ─── Edges: the relationships in the graph ───────────────────────────────────
-edge Signed {}
+edge OnDay {}  # root -> Day
+
+edge Signed {}  # Day -> Visitor
+
 
 # ─── Nodes: data plus the method that presents it as a view ──────────────────
+# Signatures are grouped under the day they were signed.
+node Day {
+    has date: str = "";
+}
+
 node Visitor {
     has name: str = "",
         message: str = "",
@@ -72,7 +85,20 @@ walker:pub sign_guestbook {
         if not clean_msg {
             return;
         }
-        fresh = here +>: Signed() :+> Visitor(
+        # find-or-create today's Day node, then hang the signature under it
+        today = _today();
+        days = [
+            d
+            for d in [here-->[?:Day]]
+            if d.date == today
+        ];
+        if days {
+            day = days[0];
+        } else {
+            day = (here +>: OnDay() :+> Day(date=today))[0];
+            grant(day, level=ConnectPerm);
+        }
+        fresh = day +>: Signed() :+> Visitor(
             name=clean_name, message=clean_msg, created_at=_now()
         );
         grant(fresh[0], level=ConnectPerm);
@@ -87,8 +113,12 @@ walker:pub get_guestbook {
 
     can run with Root entry {
         for r in allroots() {
-            visit [r-->[?:Visitor]];
+            visit [r-->[?:Day]];
         }
+    }
+
+    can descend with Day entry {
+        visit [here-->[?:Visitor]];
     }
 
     can gather with Visitor entry {
@@ -122,13 +152,24 @@ walker:pub explore_graph {
         self.nodes.append(GraphNodeView(id=self.rid, label="root", kind="root"));
         self.path.append(self.rid);
         self.log.append("walker spawned at root");
+        visit [-->[?:Day]];
+    }
+
+    can walk_day with Day entry {
+        did = jid(here);
+        self.nodes.append(GraphNodeView(id=did, label=here.date, kind="day"));
+        self.edges.append([self.rid, did]);
+        self.path.append(did);
+        self.log.append("entered " + here.date);
         visit [-->[?:Visitor]];
     }
 
     can walk with Visitor entry {
         vid = jid(here);
+        parents = [here<--[?:Day]];
+        did = jid(parents[0]) if parents else self.rid;
         self.nodes.append(GraphNodeView(id=vid, label=here.name, kind="visitor"));
-        self.edges.append([self.rid, vid]);
+        self.edges.append([did, vid]);
         self.path.append(vid);
         self.log.append("visited " + here.name);
     }

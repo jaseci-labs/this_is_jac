@@ -21,6 +21,8 @@ impl Showcase.signGuestbook -> None {
     gb = root spawn get_guestbook();
     guestbook = gb.reports[0] if gb.reports else [];
     gbSigning = False;
+    # bump the nonce so GraphView reloads its /graph iframe with the new node
+    graphNonce += 1;
 }
 
 impl Showcase.runExplore -> None {

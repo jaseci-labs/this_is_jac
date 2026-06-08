@@ -20,7 +20,11 @@ glob _CODE: str = """# server.jac - a walker IS the endpoint. No routes, no
 walker:pub sign_guestbook {
     has name: str, message: str;
     can run with `root entry {
-        here +>: Signed() :+> Visitor(
+        # group signatures by date: root -> Day -> Visitor
+        today = _today();
+        days = [d for d in [here-->[?:Day]] if d.date == today];
+        day = days[0] if days else (here +>: OnDay() :+> Day(date=today))[0];
+        day +>: Signed() :+> Visitor(
             name=self.name, message=self.message
         );
         report "written to the graph";
@@ -42,6 +46,7 @@ def:pub FullstackSection(
     onMessageChange: Callable[[str], None],
     onSign: Callable[[], None],
     signing: bool,
+    graphRefresh: int = 0,
 ) -> JsxElement {
     return
         <SectionShell
@@ -121,7 +126,7 @@ def:pub FullstackSection(
                 <CodeBlock code={_CODE} filename="server.jac + frontend.cl.jac"/>
             </div>
             <div className="mt-8">
-                <GraphView/>
+                <GraphView refreshKey={graphRefresh}/>
             </div>
             </div>
         </SectionShell>;

@@ -11,18 +11,22 @@ import from .CodeBlock { CodeBlock }
 import from .SectionShell { SectionShell }
 sv import from ..server { GraphSnapshot }
 
-glob _CODE: str = """# Each guestbook signature is a Visitor node hung off the
-# root by a typed Signed edge - real data, not a fixture.
+glob _CODE: str = """# Signatures are grouped by date: root -> Day -> Visitor,
+# all real graph data, not a fixture.
+node Day { has date: str; }
 node Visitor { has name: str, message: str; }
-edge Signed {}
+edge OnDay {}  edge Signed {}
 
-# The walker starts at the root and reacts at each node it
+# The walker starts at root and reacts at each node type it
 # lands on. Traversal is `visit`, never a hand-rolled loop.
 walker:pub explore_graph {
     has path: list[str] = [];
 
     can run with `root entry {
-        visit [-->[?:Visitor]];        # step onto the real graph
+        visit [-->[?:Day]];            # step onto the day nodes
+    }
+    can walk_day with Day entry {
+        visit [-->[?:Visitor]];        # then each day's signatures
     }
     can walk with Visitor entry {
         self.path.append(here.name);   # record the visit
@@ -33,6 +37,9 @@ walker:pub explore_graph {
 def _node_fill(kind: str) -> str {
     if kind == "root" {
         return "var(--primary)";
+    }
+    if kind == "day" {
+        return "color-mix(in oklch, var(--primary) 72%, var(--muted))";
     }
     return "color-mix(in oklch, var(--primary) 45%, var(--muted))";
 }
@@ -47,18 +54,24 @@ def:pub OspSection(
     path = snapshot.path if snapshot else [];
     log = snapshot.log if snapshot else [];
 
-    # Real layout: the root on top, each visited Visitor (a guestbook
-    # signature) spread along a row beneath it.
+    # Real layout: root on top, the Day nodes in a middle row, and each
+    # signature (Visitor) spread along the bottom row under its day.
     positions: dict[str, dict] = {};
     roots = [n for n in nodes if n.kind == "root"];
-    others = [n for n in nodes if n.kind != "root"];
+    days = [n for n in nodes if n.kind == "day"];
+    visitors = [n for n in nodes if n.kind == "visitor"];
     for n in roots {
-        positions[n.id] = {"x": 500.0, "y": 72.0};
+        positions[n.id] = {"x": 500.0, "y": 60.0};
     }
-    cnt = len(others);
-    for (i, n) in enumerate(others) {
-        x = 500.0 if cnt <= 1 else 90.0 + i * (820.0 / (cnt - 1));
-        positions[n.id] = {"x": x, "y": 408.0};
+    dcnt = len(days);
+    for (i, n) in enumerate(days) {
+        x = 500.0 if dcnt <= 1 else 160.0 + i * (680.0 / (dcnt - 1));
+        positions[n.id] = {"x": x, "y": 250.0};
+    }
+    vcnt = len(visitors);
+    for (i, n) in enumerate(visitors) {
+        x = 500.0 if vcnt <= 1 else 90.0 + i * (820.0 / (vcnt - 1));
+        positions[n.id] = {"x": x, "y": 430.0};
     }
 
     order: dict[str, int] = {};
@@ -79,16 +92,24 @@ def:pub OspSection(
     for n in nodes {
         if n.id in positions {
             p = positions[n.id];
-            is_root = n.kind == "root";
+            radius = 26.0;
+            loff = 44.0;
+            if n.kind == "day" {
+                radius = 20.0;
+                loff = 36.0;
+            } elif n.kind == "visitor" {
+                radius = 16.0;
+                loff = 32.0;
+            }
             node_items.append(
                 {
                     "x": p["x"],
                     "y": p["y"],
                     "label": n.label,
                     "fill": _node_fill(n.kind),
-                    "r": 26.0 if is_root else 16.0,
+                    "r": radius,
                     "ord": str(order[n.id]) if n.id in order else "",
-                    "ly": (p["y"] + 44.0) if is_root else (p["y"] + 32.0)
+                    "ly": p["y"] + loff
                 }
             );
         }
@@ -99,7 +120,7 @@ def:pub OspSection(
             id="osp"
             eyebrow="Object-Spatial"
             title="The program is a graph; walkers walk it"
-            subtitle="Data lives in nodes joined by typed edges; logic rides on walkers that move through the topology. The graph on the right is real - the walker just traversed this server's graph, one node per guestbook signature above."
+            subtitle="Data lives in nodes joined by typed edges; logic rides on walkers that move through the topology. The graph on the right is real - the walker just traversed this server's graph: each guestbook signature above, grouped under the day it was signed."
         >
             <div className="grid items-start gap-8 lg:grid-cols-2">
                 <CodeBlock code={_CODE} filename="server.jac"/>

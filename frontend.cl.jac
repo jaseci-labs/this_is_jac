@@ -50,7 +50,8 @@ def:pub Showcase -> JsxElement {
         gbMessage: str = "",
         gbSigning: bool = False,
         snapshot: GraphSnapshot | None = None,
-        exploring: bool = False;
+        exploring: bool = False,
+        graphNonce: int = 0;
 
     can with entry {
         loadInitial();
@@ -85,6 +86,7 @@ def:pub Showcase -> JsxElement {
                     onMessageChange={lambda v: str { gbMessage = v; }}
                     onSign={signGuestbook}
                     signing={gbSigning}
+                    graphRefresh={graphNonce}
                 />
                 <OspSection {snapshot} {exploring} onExplore={runExplore}/>
                 <ByllmSection/>

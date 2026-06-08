@@ -97,8 +97,8 @@ cl def Composer -> JsxElement {
                         <span className="font-mono text-foreground">Tweet</span>{" "}
                         back. No fetch, no REST route, no JSON.
                     </p>
-                    <div className="grid items-start gap-4 lg:grid-cols-2">
-                        <CodeBlock filename="app.jac" code={app_code}/>
+                    <div className="grid items-stretch gap-4 lg:grid-cols-2">
+                        <CodeBlock filename="app.jac" code={app_code} dense={True}/>
                         <DocsView/>
                     </div>
                     <p className="mt-3 text-center text-xs text-muted-foreground">

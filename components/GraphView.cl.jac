@@ -1,11 +1,12 @@
 """A small framed panel that embeds the runtime's Jac Graph Visualizer
 (`/graph`). It renders the live node/edge topology the server holds - including
-the Visitor nodes the guestbook (just above) writes. Sits below the live
-guestbook in the fullstack section."""
+the Day and Visitor nodes the guestbook (just above) writes, each signature
+grouped under the day it was signed. Sits below the live guestbook in the
+fullstack section."""
 
 import from "lucide-react" { Waypoints, ArrowUpRight }
 
-def:pub GraphView -> JsxElement {
+def:pub GraphView(refreshKey: int = 0) -> JsxElement {
     return
         <div className="overflow-hidden rounded-xl border border-border bg-card shadow-lg shadow-black/20">
             <div
@@ -24,7 +25,7 @@ def:pub GraphView -> JsxElement {
                 </a>
             </div>
             <iframe
-                src="/graph"
+                src={"/graph?v=" + str(refreshKey)}
                 title="Jac Graph Visualizer"
                 className="h-[440px] w-full border-0 bg-background"
             />
@@ -32,8 +33,9 @@ def:pub GraphView -> JsxElement {
                 className="border-t border-border/70 px-3 py-2 text-[0.7rem] leading-snug text-muted-foreground"
             >
                 This is the <span className="text-foreground">public graph</span> -
-                the very Visitor nodes the guestbook above writes. Sign it and watch
-                the topology grow; logged-in littleX accounts get their own graph here.
+                the Day and Visitor nodes the guestbook above writes, each signature
+                grouped under the day it was signed. Logged-in littleX accounts get
+                their own graph here.
             </p>
         </div>;
 }

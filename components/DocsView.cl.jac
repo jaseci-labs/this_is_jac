@@ -1,4 +1,4 @@
-"""A small framed panel that embeds the auto-generated FastAPI Swagger UI
+"""A framed panel that embeds the auto-generated FastAPI Swagger UI
 (`/docs`). Every endpoint this server exposes - littleX's social walkers and the
 showcase's - is documented and callable here. Sits beside the single-file tweet
 example, showing that same code surfaced as a live REST API."""
@@ -7,7 +7,9 @@ import from "lucide-react" { FileText, ArrowUpRight }
 
 def:pub DocsView -> JsxElement {
     return
-        <div className="overflow-hidden rounded-xl border border-border bg-card shadow-lg shadow-black/20">
+        <div
+            className="flex h-full flex-col overflow-hidden rounded-xl border border-border bg-card shadow-lg shadow-black/20"
+        >
             <div
                 className="flex items-center gap-1.5 border-b border-border/70 bg-white/[0.02] px-3 py-2 font-mono text-xs text-muted-foreground"
             >
@@ -26,7 +28,7 @@ def:pub DocsView -> JsxElement {
             <iframe
                 src="/docs"
                 title="API docs (Swagger UI)"
-                className="h-[440px] w-full border-0 bg-white"
+                className="w-full flex-1 min-h-[420px] border-0 bg-white"
             />
         </div>;
 }

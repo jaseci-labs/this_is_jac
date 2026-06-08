@@ -135,7 +135,7 @@ def _tokenize(src: str) -> list[dict] {
     return out;
 }
 
-def:pub CodeBlock(code: str, filename: str = "main.jac", className: str = "") -> JsxElement {
+def:pub CodeBlock(code: str, filename: str = "main.jac", className: str = "", dense: bool = False) -> JsxElement {
     has copied: bool = False;
 
     tokens = _tokenize(code);
@@ -174,7 +174,7 @@ def:pub CodeBlock(code: str, filename: str = "main.jac", className: str = "") ->
                 </button>
             </div>
             <pre
-                className="overflow-x-auto p-4 text-[13px] leading-relaxed"
+                className={"overflow-x-auto p-4 text-[13px] " + ("leading-snug" if dense else "leading-relaxed")}
             >
                 <code className="font-mono">
                     {[
