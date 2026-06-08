@@ -33,7 +33,9 @@ def:pub EcoCard(name: str, sub: str, code: str, accent: str, icon: any) -> JsxEl
                     {icon}
                 </span>
                 <div className="min-w-0">
-                    <div className="font-display font-bold leading-tight text-foreground">
+                    <div
+                        className="font-display font-bold leading-tight text-foreground"
+                    >
                         {name}
                     </div>
                     <div className="text-xs text-muted-foreground">{sub}</div>
@@ -53,7 +55,7 @@ def:pub InteropSection -> JsxElement {
             id="interop"
             eyebrow="Interop"
             title="Import anything, link anything"
-            subtitle="One .jac module imports straight from Python and npm - packages and your own files - and links any C-ABI library by name. No generated bindings, no FFI boilerplate, no glue layer."
+            subtitle="One .jac module imports straight from Python and npm and links any C-ABI library by name. No generated bindings, no FFI boilerplate, no glue layer."
         >
             <div className="mx-auto max-w-5xl">
                 <div className="grid gap-4 sm:grid-cols-3">
@@ -79,7 +81,6 @@ def:pub InteropSection -> JsxElement {
                         icon={<Cpu size={18}/>}
                     />
                 </div>
-
                 <svg
                     viewBox="0 0 600 64"
                     preserveAspectRatio="none"
@@ -111,7 +112,6 @@ def:pub InteropSection -> JsxElement {
                         strokeWidth={2}
                     />
                 </svg>
-
                 <div
                     className="mx-auto flex max-w-sm items-center gap-3 rounded-2xl border border-primary/40 bg-primary/10 px-5 py-4 shadow-lg shadow-primary/10"
                 >

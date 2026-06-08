@@ -9,17 +9,48 @@ app is one click away at `/littlex`."""
 import from "lucide-react" { AppWindow, ArrowUpRight }
 import from "@jac/runtime" { Link }
 import from .SectionShell { SectionShell }
+import from .CodeBlock { CodeBlock }
 import from .GraphView { GraphView }
 import from .DocsView { DocsView }
 import from ..littlex.frontend { app as LittleX }
 
 def:pub LittleXSection -> JsxElement {
+    app_code = (
+        """# app.jac - the data, the endpoint, and the UI in one file.
+
+# this is a class
+node Tweet {
+    has content: str,
+        author: str,
+        likes: int = 0;
+}
+
+# Back end: compiles to a public endpoint - this IS the API (no route, no controller).
+def:pub create_tweet(content: str) -> Tweet {
+    # this might look strange, but it abstracts away auth and db
+    root ++> (tweet := Tweet(content=content, author="ada"));
+    return tweet;
+}
+
+# Front end: a cl def calls the endpoint like a function.
+cl def Composer -> JsxElement {
+    has text: str = "";
+
+    async def post -> None {
+        new_tweet = await create_tweet(text);   # typed Tweet, end to end
+        print(new_tweet.author, new_tweet.likes);
+    }
+
+    return <button onClick={post}>Tweet</button>;
+}"""
+    );
+
     return
         <SectionShell
             id="littlex"
             eyebrow="Real apps"
-            title="A whole social app, one component, same graph"
-            subtitle="littleX - a full Twitter-style app with auth, feeds, follows, channels and profiles - dropped in as a single component. Its walkers run in this very server and persist to the same graph as everything above."
+            title="This Component is a Full Stack App"
+            subtitle="Fully functional Twitter-style app with auth, feeds, follows, channels and profiles - dropped in as a single component. 0 lines of code for REST API, database schema, client-server comms. (The Jac compiler generates it) Experience it here or open it at /littlex."
         >
             <div className="mx-auto max-w-5xl">
                 <div
@@ -45,15 +76,32 @@ def:pub LittleXSection -> JsxElement {
                             <ArrowUpRight size={13}/>
                         </Link>
                     </div>
-                    <div className="h-[78vh] min-h-[600px] max-h-[860px] overflow-hidden bg-background">
+                    <div
+                        className="h-[78vh] min-h-[600px] max-h-[860px] overflow-hidden bg-background"
+                    >
                         <LittleX/>
                     </div>
                 </div>
                 <p className="mt-4 text-center text-sm text-muted-foreground">
-                    Sign up inside the frame to try it - your account and posts persist in the shared graph.
-                    Or <Link to="/littlex" className="font-medium text-primary hover:underline">open the full app at /littlex</Link>.
+                    Sign up inside the frame to try it - your account and posts persist in the shared graph. Or{" "}
+                    <Link
+                        to="/littlex"
+                        className="font-medium text-primary hover:underline"
+                    >
+                        open the full app at /littlex
+                    </Link>
+                    .
                 </p>
-
+                <div className="mb-10">
+                    <p className="mb-4 text-center text-sm text-muted-foreground">
+                        The data, the endpoint, and the UI in one file: the front end calls the back end like a function and gets a typed{" "}
+                        <span className="font-mono text-foreground">Tweet</span>{" "}
+                        back. No fetch, no REST route, no JSON.
+                    </p>
+                    <div className="mx-auto max-w-2xl">
+                        <CodeBlock filename="app.jac" code={app_code}/>
+                    </div>
+                </div>
                 <div className="mt-6 grid gap-4 md:grid-cols-2">
                     <GraphView/>
                     <DocsView/>

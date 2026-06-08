@@ -5,7 +5,7 @@ import from .ui.button { Button }
 
 def:pub OutroSection -> JsxElement {
     return
-        <section className="relative overflow-hidden px-6 py-32">
+        <section className="relative flex min-h-screen flex-col justify-center overflow-hidden px-6 py-32">
             <div className="tij-glow absolute inset-x-0 bottom-0 -z-10 h-[400px] rotate-180"/>
             <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
                 <h2
