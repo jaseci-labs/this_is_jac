@@ -168,6 +168,10 @@
 .tij-pulse { animation: tij-pulse 1.6s ease-in-out infinite; }
 .tij-bounce { animation: tij-bounce-down 1.8s ease-in-out infinite; }
 
+/* flowing dashes along the interop funnel connectors */
+@keyframes tij-flow { to { stroke-dashoffset: -16; } }
+.tij-flow { stroke-dasharray: 5 7; animation: tij-flow 0.9s linear infinite; }
+
 /* thin custom scrollbar */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }

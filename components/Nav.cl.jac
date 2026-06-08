@@ -6,6 +6,7 @@ import from "lucide-react" { Sun, Moon, Github }
 import from .ui.button { Button }
 
 glob _LINKS: list[dict] = [
+    {"href": "#interop", "label": "Interop"},
     {"href": "#fullstack", "label": "Fullstack"},
     {"href": "#osp", "label": "Object-Spatial"},
     {"href": "#ai", "label": "AI-native"},

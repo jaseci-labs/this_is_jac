@@ -17,6 +17,7 @@ Each section is its own component under [`components/`](components/), composed b
 | Section | Capability | Live? |
 | ------- | ---------- | ----- |
 | **Hero** | the pitch + a one-file `cl` / `na` / walker teaser | static |
+| **Interop** | one `.jac` imports Python (PyPI + files), npm (js/ts/jsx + npmjs) and links any C-ABI library | static - a funnel diagram of the three ecosystems flowing into one module |
 | **Fullstack** | one language across the wire | **live** - a guestbook backed by `sign_guestbook` / `get_guestbook` walkers, persisted to a real graph |
 | **Object-Spatial** | the program is a graph; walkers walk it | **live** - `explore_graph` traverses the **real** graph (root -> every guestbook signature) and the section draws the actual path; no demo data |
 | **AI-native** | a function body delegated to an LLM with `by llm()` | static (code + illustrated call) |

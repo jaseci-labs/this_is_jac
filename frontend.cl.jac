@@ -7,15 +7,12 @@ the rest pair real Jac source with captured or in-browser demos. Handler bodies
 live in `frontend.impl.jac`.
 """
 
-sv import from .server {
-    sign_guestbook,
-    get_guestbook,
-    explore_graph
-}
+sv import from .server { sign_guestbook, get_guestbook, explore_graph }
 sv import from .server { GuestEntry, GraphSnapshot }
 
 import from .components.Nav { Nav }
 import from .components.HeroSection { HeroSection }
+import from .components.InteropSection { InteropSection }
 import from .components.FullstackSection { FullstackSection }
 import from .components.OspSection { OspSection }
 import from .components.ByllmSection { ByllmSection }
@@ -35,11 +32,11 @@ def:pub app -> JsxElement {
             <Routes>
                 <Route
                     path="/littlex"
-                    element={
-                        <div className="h-screen overflow-hidden bg-background text-foreground">
-                            <LittleX/>
-                        </div>
-                    }
+                    element={<div
+                        className="h-screen overflow-hidden bg-background text-foreground"
+                    >
+                        <LittleX/>
+                    </div>}
                 />
                 <Route path="/*" element={<Showcase/>}/>
             </Routes>
@@ -76,6 +73,10 @@ def:pub Showcase -> JsxElement {
             <Nav {darkMode} onToggleTheme={lambda { darkMode = not darkMode; }}/>
             <main>
                 <HeroSection/>
+                <InteropSection/>
+                <LittleXSection/>
+                <NativeSection/>
+                <WasmShooterSection/>
                 <FullstackSection
                     entries={guestbook}
                     name={gbName}
@@ -87,9 +88,6 @@ def:pub Showcase -> JsxElement {
                 />
                 <OspSection {snapshot} {exploring} onExplore={runExplore}/>
                 <ByllmSection/>
-                <NativeSection/>
-                <WasmShooterSection/>
-                <LittleXSection/>
                 <OutroSection/>
             </main>
         </div>;
