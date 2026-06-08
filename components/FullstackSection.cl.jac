@@ -11,6 +11,7 @@ import from .ui.button { Button }
 import from .ui.avatar { Avatar, AvatarFallback }
 import from .ui.badge { Badge }
 import from .CodeBlock { CodeBlock }
+import from .GraphView { GraphView }
 import from .SectionShell { SectionShell }
 sv import from ..server { GuestEntry }
 
@@ -49,9 +50,8 @@ def:pub FullstackSection(
             title="One language, server to browser"
             subtitle="No REST boilerplate, no client SDK, no type drift. The browser spawns the very same walker that runs on the server - sign below and it's persisted to a real graph."
         >
+            <div>
             <div className="grid items-start gap-8 lg:grid-cols-2">
-                <CodeBlock code={_CODE} filename="server.jac + frontend.cl.jac"/>
-
                 <Card className="border-border bg-card/60">
                     <CardContent className="flex flex-col gap-4 p-6">
                         <div className="flex items-center justify-between">
@@ -117,6 +117,12 @@ def:pub FullstackSection(
                         </div>
                     </CardContent>
                 </Card>
+
+                <CodeBlock code={_CODE} filename="server.jac + frontend.cl.jac"/>
+            </div>
+            <div className="mt-8">
+                <GraphView/>
+            </div>
             </div>
         </SectionShell>;
 }

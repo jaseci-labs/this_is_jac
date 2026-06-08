@@ -1,7 +1,7 @@
 """A small framed panel that embeds the runtime's Jac Graph Visualizer
 (`/graph`). It renders the live node/edge topology the server holds - including
-whatever littleX (just above) has written - as a server view surfaced beside the
-app. Sits side-by-side with `DocsView` below the littleX embed."""
+the Visitor nodes the guestbook (just above) writes. Sits below the live
+guestbook in the fullstack section."""
 
 import from "lucide-react" { Waypoints, ArrowUpRight }
 
@@ -31,9 +31,9 @@ def:pub GraphView -> JsxElement {
             <p
                 className="border-t border-border/70 px-3 py-2 text-[0.7rem] leading-snug text-muted-foreground"
             >
-                Anonymous, this shows the <span className="text-foreground">public graph</span>
-                (the guestbook). Log in to littleX above and it switches to that
-                user's graph - profiles, tweets and follows you create.
+                This is the <span className="text-foreground">public graph</span> -
+                the very Visitor nodes the guestbook above writes. Sign it and watch
+                the topology grow; logged-in littleX accounts get their own graph here.
             </p>
         </div>;
 }

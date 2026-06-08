@@ -1,7 +1,7 @@
 """A small framed panel that embeds the auto-generated FastAPI Swagger UI
-(`/docs`). Every walker this server exposes - littleX's social walkers and the
-showcase's - is a documented, callable endpoint here. Sits side-by-side with
-`GraphView` below the littleX embed."""
+(`/docs`). Every endpoint this server exposes - littleX's social walkers and the
+showcase's - is documented and callable here. Sits beside the single-file tweet
+example, showing that same code surfaced as a live REST API."""
 
 import from "lucide-react" { FileText, ArrowUpRight }
 

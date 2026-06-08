@@ -10,7 +10,6 @@ import from "lucide-react" { AppWindow, ArrowUpRight }
 import from "@jac/runtime" { Link }
 import from .SectionShell { SectionShell }
 import from .CodeBlock { CodeBlock }
-import from .GraphView { GraphView }
 import from .DocsView { DocsView }
 import from ..littlex.frontend { app as LittleX }
 
@@ -25,7 +24,7 @@ node Tweet {
         likes: int = 0;
 }
 
-# Back end: compiles to a public endpoint - this IS the API (no route, no controller).
+# Back end: compiles to a public endpoint - this IS the API.
 def:pub create_tweet(content: str) -> Tweet {
     # this might look strange, but it abstracts away auth and db
     root ++> (tweet := Tweet(content=content, author="ada"));
@@ -37,7 +36,7 @@ cl def Composer -> JsxElement {
     has text: str = "";
 
     async def post -> None {
-        new_tweet = await create_tweet(text);   # typed Tweet, end to end
+        new_tweet = await create_tweet(text);  # typed end to end
         print(new_tweet.author, new_tweet.likes);
     }
 
@@ -98,17 +97,14 @@ cl def Composer -> JsxElement {
                         <span className="font-mono text-foreground">Tweet</span>{" "}
                         back. No fetch, no REST route, no JSON.
                     </p>
-                    <div className="mx-auto max-w-2xl">
+                    <div className="grid items-start gap-4 lg:grid-cols-2">
                         <CodeBlock filename="app.jac" code={app_code}/>
+                        <DocsView/>
                     </div>
+                    <p className="mt-3 text-center text-xs text-muted-foreground">
+                        That single file is already a live API: every endpoint shows up in the auto-generated Swagger UI on the right.
+                    </p>
                 </div>
-                <div className="mt-6 grid gap-4 md:grid-cols-2">
-                    <GraphView/>
-                    <DocsView/>
-                </div>
-                <p className="mt-3 text-center text-xs text-muted-foreground">
-                    Two more server views, side by side: the live graph littleX writes to, and the auto-generated API for every walker.
-                </p>
             </div>
         </SectionShell>;
 }
