@@ -48,8 +48,8 @@ cl def Composer -> JsxElement {
         <SectionShell
             id="littlex"
             eyebrow="Real apps"
-            title="This Component is a Full Stack App"
-            subtitle="Fully functional Twitter-style app with auth, feeds, follows, channels and profiles - dropped in as a single component. 0 lines of code for REST API, database schema, client-server comms. (The Jac compiler generates it) Experience it here or open it at /littlex."
+            title="Fully Implemented Twitter-like App"
+            subtitle="All frontend/backend interfacing, data handling, and db organization is abstracted away (done for you and optimized by the compiler)."
         >
             <div className="mx-auto max-w-5xl">
                 <div

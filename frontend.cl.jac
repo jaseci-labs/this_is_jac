@@ -7,13 +7,14 @@ the rest pair real Jac source with captured or in-browser demos. Handler bodies
 live in `frontend.impl.jac`.
 """
 
-sv import from .guestbook { sign_guestbook, get_guestbook, explore_graph }
+sv import from .guestbook { sign_guestbook, get_guestbook, explore_graph, guestbook_stats }
 sv import from .guestbook { GuestEntry, GraphSnapshot }
 
 import from .components.Nav { Nav }
 import from .components.HeroSection { HeroSection }
 import from .components.InteropSection { InteropSection }
 import from .components.FullstackSection { FullstackSection }
+import from .components.MicroservicesSection { MicroservicesSection }
 import from .components.OspSection { OspSection }
 import from .components.ByllmSection { ByllmSection }
 import from .components.NativeSection { NativeSection }
@@ -51,7 +52,9 @@ def:pub Showcase -> JsxElement {
         gbSigning: bool = False,
         snapshot: GraphSnapshot | None = None,
         exploring: bool = False,
-        graphNonce: int = 0;
+        graphNonce: int = 0,
+        microStats: dict | None = None,
+        microRunning: bool = False;
 
     can with entry {
         loadInitial();
@@ -68,6 +71,7 @@ def:pub Showcase -> JsxElement {
     async def loadInitial -> None;
     async def signGuestbook -> None;
     async def runExplore -> None;
+    async def runStats -> None;
 
     return
         <div className="min-h-screen bg-background text-foreground">
@@ -85,6 +89,11 @@ def:pub Showcase -> JsxElement {
                     onSign={signGuestbook}
                     signing={gbSigning}
                     graphRefresh={graphNonce}
+                />
+                <MicroservicesSection
+                    stats={microStats}
+                    running={microRunning}
+                    onRun={runStats}
                 />
                 <NativeSection/>
                 <WasmShooterSection/>

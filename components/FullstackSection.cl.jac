@@ -52,82 +52,100 @@ def:pub FullstackSection(
         <SectionShell
             id="fullstack"
             eyebrow="Fullstack"
-            title="One language, server to browser"
-            subtitle="No REST boilerplate, no client SDK, no type drift. The browser spawns the very same walker that runs on the server - sign below and it's persisted to a real graph."
+            title="Never Use Another Graph Library Again"
+            subtitle="Use graph centric PL semantics to solve problems in an intuitive and elegant way. Sign below and it's persisted to a real graph."
         >
             <div>
-            <div className="grid items-start gap-8 lg:grid-cols-2">
-                <Card className="border-border bg-card/60">
-                    <CardContent className="flex flex-col gap-4 p-6">
-                        <div className="flex items-center justify-between">
-                            <span className="flex items-center gap-2 text-sm font-medium text-foreground">
-                                <MessageSquare size={15} className="text-primary"/>
-                                Live guestbook
-                            </span>
-                            <Badge variant="secondary" className="gap-1 font-normal">
-                                <Database size={11}/>
-                                {str(len(entries))} in graph
-                            </Badge>
-                        </div>
-
-                        <div className="flex flex-col gap-2">
-                            <Input
-                                placeholder="Your name"
-                                value={name}
-                                maxLength={40}
-                                onChange={lambda e: ChangeEvent { onNameChange(e.target.value); }}
-                            />
-                            <Textarea
-                                placeholder="Leave a message for the graph..."
-                                value={message}
-                                rows={2}
-                                maxLength={200}
-                                className="resize-none"
-                                onChange={lambda e: ChangeEvent { onMessageChange(e.target.value); }}
-                            />
-                            <Button
-                                className="self-end rounded-full px-5 font-semibold"
-                                disabled={signing or not message.strip()}
-                                onClick={lambda { onSign(); }}
+                <div className="grid items-start gap-8 lg:grid-cols-2">
+                    <Card className="border-border bg-card/60">
+                        <CardContent className="flex flex-col gap-4 p-6">
+                            <div className="flex items-center justify-between">
+                                <span
+                                    className="flex items-center gap-2 text-sm font-medium text-foreground"
+                                >
+                                    <MessageSquare size={15} className="text-primary"/>
+                                    Live guestbook
+                                </span>
+                                <Badge
+                                    variant="secondary"
+                                    className="gap-1 font-normal"
+                                >
+                                    <Database size={11}/>
+                                    {str(len(entries))}{" "}
+                                    in graph
+                                </Badge>
+                            </div>
+                            <div className="flex flex-col gap-2">
+                                <Input
+                                    placeholder="Your name"
+                                    value={name}
+                                    maxLength={40}
+                                    onChange={lambda e: ChangeEvent { onNameChange(
+                                        e.target.value
+                                    ); }}
+                                />
+                                <Textarea
+                                    placeholder="Leave a message for the graph..."
+                                    value={message}
+                                    rows={2}
+                                    maxLength={200}
+                                    className="resize-none"
+                                    onChange={lambda e: ChangeEvent { onMessageChange(
+                                        e.target.value
+                                    ); }}
+                                />
+                                <Button
+                                    className="self-end rounded-full px-5 font-semibold"
+                                    disabled={signing or not message.strip()}
+                                    onClick={lambda { onSign(); }}
+                                >
+                                    <Send size={15}/>
+                                    {"Signing..." if signing else "Sign the graph"}
+                                </Button>
+                            </div>
+                            <div
+                                className="flex max-h-72 flex-col gap-3 overflow-y-auto pr-1"
                             >
-                                <Send size={15}/>
-                                {"Signing..." if signing else "Sign the graph"}
-                            </Button>
-                        </div>
-
-                        <div className="flex max-h-72 flex-col gap-3 overflow-y-auto pr-1">
-                            {if len(entries) == 0 {
-                                <div className="py-8 text-center text-sm text-muted-foreground">
-                                    No signatures yet - be the first node.
-                                </div>
-                            }}
-                            {[
-                                <div className="tij-fade-up flex gap-3" key={e.id}>
-                                    <Avatar className="size-9 shrink-0">
-                                        <AvatarFallback className="bg-primary/15 text-sm text-primary">
-                                            {(e.name[0].upper() if e.name else "?")}
-                                        </AvatarFallback>
-                                    </Avatar>
-                                    <div className="min-w-0 flex-1 rounded-lg border border-border bg-background/50 px-3 py-2">
-                                        <div className="text-sm font-semibold text-foreground">
-                                            {e.name}
-                                        </div>
-                                        <div className="break-words text-sm text-muted-foreground">
-                                            {e.message}
-                                        </div>
+                                {if len(entries) == 0 {
+                                    <div
+                                        className="py-8 text-center text-sm text-muted-foreground"
+                                    >
+                                        No signatures yet - be the first node.
                                     </div>
-                                </div>
-                                for e in entries
-                            ]}
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <CodeBlock code={_CODE} filename="guestbook.jac + frontend.cl.jac"/>
-            </div>
-            <div className="mt-8">
-                <GraphView refreshKey={graphRefresh}/>
-            </div>
+                                }}
+                                {[
+                                    <div className="tij-fade-up flex gap-3" key={e.id}>
+                                        <Avatar className="size-9 shrink-0">
+                                            <AvatarFallback
+                                                className="bg-primary/15 text-sm text-primary"
+                                            >
+                                                {(e.name[0].upper() if e.name else "?")}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                        <div
+                                            className="min-w-0 flex-1 rounded-lg border border-border bg-background/50 px-3 py-2"
+                                        >
+                                            <div
+                                                className="text-sm font-semibold text-foreground"
+                                            >
+                                                {e.name}
+                                            </div>
+                                            <div
+                                                className="break-words text-sm text-muted-foreground"
+                                            >
+                                                {e.message}
+                                            </div>
+                                        </div>
+                                    </div> for e in entries
+                                ]}
+                            </div>
+                        </CardContent>
+                    </Card>
+                    <CodeBlock code={_CODE} filename="guestbook.jac + frontend.cl.jac"/>
+                </div>
+                <div className="mt-8">
+                    <GraphView refreshKey={graphRefresh}/>
+                </div>
             </div>
         </SectionShell>;
 }

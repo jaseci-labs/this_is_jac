@@ -31,3 +31,9 @@ impl Showcase.runExplore -> None {
     snapshot = gr.reports[0] if gr.reports else snapshot;
     exploring = False;
 }
+
+impl Showcase.runStats -> None {
+    microRunning = True;
+    microStats = await guestbook_stats();
+    microRunning = False;
+}

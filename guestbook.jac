@@ -16,6 +16,13 @@ entry`). Traversal is always `visit`, never a hand-rolled loop.
 """
 
 import datetime;
+import os;
+
+# Microservice boundary: one line. This module already serves its walkers to the
+# browser (cl->sv); this relative `sv import` ALSO makes it a server->server
+# consumer. The runtime spawns `analytics` as its own process the first time
+# `analyze(...)` is called and routes to it.
+sv import from .analytics { analyze, AnalyticsReport }
 
 def _now -> str {
     return datetime.datetime.now(datetime.UTC).replace(tzinfo=None).isoformat() + "Z";
@@ -133,6 +140,29 @@ walker:pub get_guestbook {
         self.results.sort(key=lambda e: GuestEntry : e.created_at, reverse=True);
         report self.results[:50];
     }
+}
+
+# ─── Microservice call: hand the live signature count to the analytics service ─
+# This function runs in the guestbook (gateway) process; `analyze(...)` runs in a
+# SEPARATE process the runtime spawned from the `sv import` above. The two pids
+# in the result prove they are not the same process.
+def:pub guestbook_stats() -> dict {
+    signatures = 0;
+    for r in allroots() {
+        for day in [r-->[?:Day]] {
+            signatures += len([day-->[?:Visitor]]);
+        }
+    }
+    # cross-process call -> separate process. The sv stub is typed as an async
+    # coroutine but the call resolves synchronously to the typed AnalyticsReport,
+    # so bind through `any` and read it by attribute.
+    rep: any = analyze(signatures);
+    return {
+        "signatures": signatures,
+        "gateway_pid": os.getpid(),
+        "analytics_pid": rep.pid,
+        "score": rep.score
+    };
 }
 
 # ─── Graph traversal (real data) ─────────────────────────────────────────────
