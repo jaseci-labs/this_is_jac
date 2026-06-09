@@ -56,7 +56,10 @@ obj GraphSnapshot {
 # ─── Edges: the relationships in the graph ───────────────────────────────────
 edge OnDay {}  # root -> Day
 
+
+
 edge Signed {}  # Day -> Visitor
+
 
 
 # ─── Nodes: data plus the method that presents it as a view ──────────────────
@@ -87,26 +90,25 @@ walker:pub sign_guestbook {
         reports: list[GuestEntry] = [];
 
     can run with Root entry {
-        clean_name = self.name.strip()[:40] or "anonymous";
-        clean_msg = self.message.strip()[:200];
-        if not clean_msg {
+        if not self.message.strip() {
             return;
         }
-        # find-or-create today's Day node, then hang the signature under it
+        # Walk into today's Day node, creating it on the day's first sign. The
+        # `else` fires when the visit enqueues nothing (no Day for today yet).
         today = _today();
-        days = [
-            d
-            for d in [here-->[?:Day]]
-            if d.date == today
-        ];
-        if days {
-            day = days[0];
-        } else {
-            day = (here +>: OnDay() :+> Day(date=today))[0];
-            grant(day, level=ConnectPerm);
+        visit [here-->[?:Day, date == today]] else {
+            fresh_day = here +>: OnDay() :+> Day(date=today);
+            grant(fresh_day[0], level=ConnectPerm);
+            visit fresh_day;
         }
-        fresh = day +>: Signed() :+> Visitor(
-            name=clean_name, message=clean_msg, created_at=_now()
+    }
+
+    can sign with Day entry {
+        # Now standing on today's Day node - hang the signature off `here`.
+        fresh = here +>: Signed() :+> Visitor(
+            name=self.name.strip()[:40] or "anonymous",
+            message=self.message.strip()[:200],
+            created_at=_now()
         );
         grant(fresh[0], level=ConnectPerm);
         report fresh[0].to_view();
@@ -153,10 +155,10 @@ def:pub guestbook_stats() -> dict {
             signatures += len([day-->[?:Visitor]]);
         }
     }
-    # cross-process call -> separate process. The sv stub is typed as an async
-    # coroutine but the call resolves synchronously to the typed AnalyticsReport,
-    # so bind through `any` and read it by attribute.
-    rep: any = analyze(signatures);
+    # cross-process call -> separate process. An sv->sv import lowers to a
+    # synchronous stub (the runtime routes to analytics' process), so the call
+    # resolves directly to the typed AnalyticsReport -- no `await` needed.
+    rep: AnalyticsReport = analyze(signatures);
     return {
         "signatures": signatures,
         "gateway_pid": os.getpid(),
