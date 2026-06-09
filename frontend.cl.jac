@@ -9,6 +9,7 @@ live in `frontend.impl.jac`.
 
 sv import from .guestbook { sign_guestbook, get_guestbook, explore_graph, guestbook_stats }
 sv import from .guestbook { GuestEntry, GraphSnapshot }
+sv import from .source_viewer { list_source_files, get_source_file }
 
 import from .components.Nav { Nav }
 import from .components.HeroSection { HeroSection }
@@ -20,6 +21,7 @@ import from .components.ByllmSection { ByllmSection }
 import from .components.NativeSection { NativeSection }
 import from .components.WasmShooterSection { WasmShooterSection }
 import from .components.LittleXSection { LittleXSection }
+import from .components.SourceViewer { SourceViewer }
 import from .components.OutroSection { OutroSection }
 import from "@jac/runtime" { Router, Routes, Route }
 import from .littlex.frontend { app as LittleX }
@@ -54,10 +56,17 @@ def:pub Showcase -> JsxElement {
         exploring: bool = False,
         graphNonce: int = 0,
         microStats: dict | None = None,
-        microRunning: bool = False;
+        microRunning: bool = False,
+        srcFiles: list[dict] = [],
+        srcFile: dict | None = None,
+        srcLoading: bool = False;
 
     can with entry {
         loadInitial();
+    }
+
+    can with entry {
+        loadSource();
     }
 
     can with [darkMode] entry {
@@ -72,6 +81,8 @@ def:pub Showcase -> JsxElement {
     async def signGuestbook -> None;
     async def runExplore -> None;
     async def runStats -> None;
+    async def loadSource -> None;
+    async def openSource(path: str) -> None;
 
     return
         <div className="min-h-screen bg-background text-foreground">
@@ -99,6 +110,12 @@ def:pub Showcase -> JsxElement {
                 <WasmShooterSection/>
                 <OspSection {snapshot} {exploring} onExplore={runExplore}/>
                 <ByllmSection/>
+                <SourceViewer
+                    files={srcFiles}
+                    current={srcFile}
+                    loading={srcLoading}
+                    onOpen={openSource}
+                />
                 <OutroSection/>
             </main>
         </div>;

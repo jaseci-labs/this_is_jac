@@ -37,3 +37,16 @@ impl Showcase.runStats -> None {
     microStats = await guestbook_stats();
     microRunning = False;
 }
+
+impl Showcase.loadSource -> None {
+    srcFiles = await list_source_files();
+    srcLoading = True;
+    srcFile = await get_source_file("frontend.cl.jac");
+    srcLoading = False;
+}
+
+impl Showcase.openSource(path: str) -> None {
+    srcLoading = True;
+    srcFile = await get_source_file(path);
+    srcLoading = False;
+}

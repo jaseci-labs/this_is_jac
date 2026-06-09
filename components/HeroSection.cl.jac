@@ -20,7 +20,7 @@ def:pub HeroSection -> JsxElement {
                     className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-4 py-1.5 text-sm text-muted-foreground backdrop-blur"
                 >
                     <span className="size-2 rounded-full bg-primary tij-pulse"/>
-                    Seeing is believing
+                    This is a tech demonstration.
                 </div>
                 <h1
                     className="font-display text-6xl font-bold leading-[0.95] tracking-tight text-foreground md:text-8xl"

@@ -33,7 +33,7 @@ def:pub WasmShooterSection -> JsxElement {
         <SectionShell
             id="wasm"
             eyebrow="WebAssembly"
-            title="The same game, now in your browser"
+            title="Oh, We can inline here, because... WASM."
             subtitle="No source changes - `jac build` compiles the na {} block to WebAssembly and the raylib externs become wasm imports, satisfied by a WebGL shim. Click to load the module and play."
         >
             <div className="mx-auto max-w-4xl">
@@ -51,16 +51,16 @@ def:pub WasmShooterSection -> JsxElement {
                             className="h-full w-full"
                             style={{"display": "block", "cursor": "crosshair"}}
                         />
-
                         <div
                             className="pointer-events-none absolute left-3 top-3 font-mono text-sm text-[#cdd6e6]"
                             style={{"textShadow": "0 1px 2px #000"}}
                         >
-                            score <b id="tij-hud-score" className="text-primary">0</b>
+                            score{" "}
+                            <b id="tij-hud-score" className="text-primary">0</b>
                             {" · "}
-                            <b id="tij-hud-fps" className="text-primary">0</b> fps
+                            <b id="tij-hud-fps" className="text-primary">0</b>{" "}
+                            fps
                         </div>
-
                         {if not launched {
                             <div
                                 className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-[#0b0e16]/90 backdrop-blur-sm"
@@ -71,7 +71,9 @@ def:pub WasmShooterSection -> JsxElement {
                                     <Gamepad2 size={30}/>
                                 </div>
                                 <div className="text-center">
-                                    <div className="font-display text-lg font-bold text-foreground">
+                                    <div
+                                        className="font-display text-lg font-bold text-foreground"
+                                    >
                                         Jac Cube Shooter
                                     </div>
                                     <div className="text-sm text-muted-foreground">
@@ -89,13 +91,19 @@ def:pub WasmShooterSection -> JsxElement {
                         }}
                     </div>
                 </div>
-
                 <p className="mt-4 text-center text-sm text-muted-foreground">
-                    Click the canvas to capture the mouse{" · "}
-                    <b className="text-foreground">WASD</b> move{" · "}
-                    mouse / arrows aim{" · "}
-                    <b className="text-foreground">Space</b> fire{" · "}
-                    <b className="text-foreground">Tab</b> release
+                    Click the canvas to capture the mouse
+                    {" · "}
+                    <b className="text-foreground">WASD</b>{" "}
+                    move
+                    {" · "}
+                    mouse / arrows aim
+                    {" · "}
+                    <b className="text-foreground">Space</b>{" "}
+                    fire
+                    {" · "}
+                    <b className="text-foreground">Tab</b>{" "}
+                    release
                 </p>
             </div>
         </SectionShell>;

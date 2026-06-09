@@ -202,3 +202,45 @@
     transform-origin: 12px 12px;
     transition: stroke-dashoffset 0.12s ease, stroke 0.2s ease;
 }
+
+/* ── Source-viewer syntax theme (Pygments token classes) ──────────────────
+   Server-side Pygments emits <span class="k">…</span> etc; these rules colour
+   them to match the site's CodeBlock palette: orange keywords, emerald
+   strings, muted comments, amber numbers, sky types. */
+.tij-code { color: oklch(0.95 0.002 286 / 0.88); }
+.tij-code .c, .tij-code .ch, .tij-code .cm, .tij-code .c1, .tij-code .cs,
+.tij-code .cp, .tij-code .cpf {
+    color: var(--muted-foreground);
+    font-style: italic;
+}
+.tij-code .k, .tij-code .kc, .tij-code .kd, .tij-code .kn, .tij-code .kp,
+.tij-code .kr, .tij-code .kt, .tij-code .ow {
+    color: var(--primary);
+}
+.tij-code .s, .tij-code .sa, .tij-code .sb, .tij-code .sc, .tij-code .dl,
+.tij-code .s2, .tij-code .s1, .tij-code .se, .tij-code .sh, .tij-code .sx,
+.tij-code .sr, .tij-code .ss, .tij-code .sb {
+    color: #34d399;
+}
+.tij-code .sd { color: #34d399; opacity: 0.72; font-style: italic; }
+.tij-code .si { color: #fcd34d; }
+.tij-code .m, .tij-code .mb, .tij-code .mf, .tij-code .mh, .tij-code .mi,
+.tij-code .mo, .tij-code .il {
+    color: #fcd34d;
+}
+.tij-code .nc, .tij-code .ne, .tij-code .nn, .tij-code .nt {
+    color: #7dd3fc;
+}
+.tij-code .nb, .tij-code .bp { color: #c4b5fd; }
+.tij-code .nd { color: #c4b5fd; font-style: italic; }
+.tij-code .nf, .tij-code .fm { color: #93c5fd; }
+.tij-code .na { color: #f0abfc; }
+.tij-code .nv, .tij-code .vc, .tij-code .vg, .tij-code .vi,
+.tij-code .nl, .tij-code .no { color: oklch(0.95 0.002 286 / 0.9); }
+.tij-code .o, .tij-code .p { color: oklch(0.95 0.002 286 / 0.72); }
+.tij-code .err { color: #f87171; }
+.tij-code .gd { color: #f87171; }
+.tij-code .gi { color: #34d399; }
+.tij-code .gh, .tij-code .gu { color: #7dd3fc; font-weight: 600; }
+.tij-code .gs { font-weight: 600; }
+.tij-code .ge { font-style: italic; }
