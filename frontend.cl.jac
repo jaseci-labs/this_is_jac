@@ -22,6 +22,7 @@ import from .components.NativeSection { NativeSection }
 import from .components.WasmShooterSection { WasmShooterSection }
 import from .components.LittleXSection { LittleXSection }
 import from .components.SourceViewer { SourceViewer }
+import from .components.SeamsSection { SeamsSection }
 import from .components.OutroSection { OutroSection }
 import from "@jac/runtime" { Router, Routes, Route }
 import from .littlex.frontend { app as LittleX }
@@ -116,6 +117,7 @@ def:pub Showcase -> JsxElement {
                     loading={srcLoading}
                     onOpen={openSource}
                 />
+                <SeamsSection/>
                 <OutroSection/>
             </main>
         </div>;
