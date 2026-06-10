@@ -2,13 +2,13 @@
 
 Owns the shared client state and the server-walker handlers, then composes the
 scroll-driven showcase from the section components in `components/`. The
-guestbook and graph-traversal sections are wired to live `guestbook.jac` walkers;
+guestbook section is wired to live `guestbook.jac` walkers;
 the rest pair real Jac source with captured or in-browser demos. Handler bodies
 live in `frontend.impl.jac`.
 """
 
-sv import from .guestbook { sign_guestbook, get_guestbook, explore_graph, guestbook_stats }
-sv import from .guestbook { GuestEntry, GraphSnapshot }
+sv import from .guestbook { sign_guestbook, get_guestbook, guestbook_stats }
+sv import from .guestbook { GuestEntry }
 sv import from .source_viewer { list_source_files, get_source_file }
 
 import from .components.Nav { Nav }
@@ -16,7 +16,6 @@ import from .components.HeroSection { HeroSection }
 import from .components.InteropSection { InteropSection }
 import from .components.FullstackSection { FullstackSection }
 import from .components.MicroservicesSection { MicroservicesSection }
-import from .components.OspSection { OspSection }
 import from .components.ByllmSection { ByllmSection }
 import from .components.NativeSection { NativeSection }
 import from .components.WasmShooterSection { WasmShooterSection }
@@ -53,8 +52,6 @@ def:pub Showcase -> JsxElement {
         gbName: str = "",
         gbMessage: str = "",
         gbSigning: bool = False,
-        snapshot: GraphSnapshot | None = None,
-        exploring: bool = False,
         graphNonce: int = 0,
         microStats: dict | None = None,
         microRunning: bool = False,
@@ -80,7 +77,6 @@ def:pub Showcase -> JsxElement {
 
     async def loadInitial -> None;
     async def signGuestbook -> None;
-    async def runExplore -> None;
     async def runStats -> None;
     async def loadSource -> None;
     async def openSource(path: str) -> None;
@@ -109,7 +105,6 @@ def:pub Showcase -> JsxElement {
                 />
                 <NativeSection/>
                 <WasmShooterSection/>
-                <OspSection {snapshot} {exploring} onExplore={runExplore}/>
                 <ByllmSection/>
                 <SourceViewer
                     files={srcFiles}

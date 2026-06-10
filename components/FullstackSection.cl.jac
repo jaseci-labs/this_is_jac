@@ -15,29 +15,27 @@ import from .GraphView { GraphView }
 import from .SectionShell { SectionShell }
 sv import from ..guestbook { GuestEntry }
 
-glob _CODE: str = """# guestbook.jac - a walker IS the endpoint. No routes, no
-# controllers; spawning it on the graph runs it server-side.
-walker:pub sign_guestbook {
-    has name: str, message: str;
+glob _CODE: str = """# Signatures are grouped by date: root.shared -> Day -> Visitor,
+# all real graph data, not a fixture. `root.shared` is the public
+# graph every anonymous request runs on - one walk reads it all.
+node Day { has date: str; }
+node Visitor { has name: str, message: str; }
+edge OnDay {}  edge Signed {}
+
+# The walker starts at the shared root and reacts at each node
+# type it lands on. Traversal is `visit`, never a hand-rolled loop.
+walker:pub explore_graph {
+    has path: list[str] = [];
+
     can run with `root entry {
-        # ONE public graph: root.shared -> Day -> Visitor. Every
-        # user - logged in or anonymous - signs the same guestbook.
-        today = _today();
-        days = [d for d in [root.shared-->[?:Day]] if d.date == today];
-        day = days[0] if days
-            else (root.shared +>: OnDay() :+> Day(date=today))[0];
-        day +>: Signed() :+> Visitor(
-            name=self.name, message=self.message
-        );
-        report "written to the graph";
+        visit [root.shared-->[?:Day]]; # step onto the day nodes
     }
-}
-
-# frontend.cl.jac - the SAME types, called from the browser.
-sv import from .guestbook { sign_guestbook }
-
-impl app.sign {
-    root spawn sign_guestbook(name=self.name, msg=self.msg);
+    can walk_day with Day entry {
+        visit [-->[?:Visitor]];        # then each day's signatures
+    }
+    can walk with Visitor entry {
+        self.path.append(here.name);   # record the visit
+    }
 }""";
 
 def:pub FullstackSection(
@@ -143,7 +141,7 @@ def:pub FullstackSection(
                             </div>
                         </CardContent>
                     </Card>
-                    <CodeBlock code={_CODE} filename="guestbook.jac + frontend.cl.jac"/>
+                    <CodeBlock code={_CODE} filename="guestbook.jac"/>
                 </div>
                 <div className="mt-8">
                     <GraphView refreshKey={graphRefresh}/>

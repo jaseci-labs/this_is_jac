@@ -7,8 +7,6 @@ folds its `reports` back into client state. Identical call shape to the server
 impl Showcase.loadInitial -> None {
     gb = root spawn get_guestbook();
     guestbook = gb.reports[0] if gb.reports else [];
-    gr = root spawn explore_graph();
-    snapshot = gr.reports[0] if gr.reports else None;
 }
 
 impl Showcase.signGuestbook -> None {
@@ -23,13 +21,6 @@ impl Showcase.signGuestbook -> None {
     gbSigning = False;
     # bump the nonce so GraphView reloads its /graph iframe with the new node
     graphNonce += 1;
-}
-
-impl Showcase.runExplore -> None {
-    exploring = True;
-    gr = root spawn explore_graph();
-    snapshot = gr.reports[0] if gr.reports else snapshot;
-    exploring = False;
 }
 
 impl Showcase.runStats -> None {

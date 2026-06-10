@@ -20,7 +20,7 @@ def:pub HeroSection -> JsxElement {
                     className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-4 py-1.5 text-sm text-muted-foreground backdrop-blur"
                 >
                     <span className="size-2 rounded-full bg-primary tij-pulse"/>
-                    This is a tech demonstration.
+                    This is a technology demonstration.
                 </div>
                 <h1
                     className="font-display text-6xl font-bold leading-[0.95] tracking-tight text-foreground md:text-8xl"
@@ -32,7 +32,7 @@ def:pub HeroSection -> JsxElement {
                 <p
                     className="mt-6 max-w-2xl text-balance text-xl text-muted-foreground"
                 >
-                    This language shouldn't exist.
+                    "This language shouldn't exist."
                 </p>
                 <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
                     <a href="#fullstack">
