@@ -20,10 +20,12 @@ glob _CODE: str = """# guestbook.jac - a walker IS the endpoint. No routes, no
 walker:pub sign_guestbook {
     has name: str, message: str;
     can run with `root entry {
-        # group signatures by date: root -> Day -> Visitor
+        # ONE public graph: root.shared -> Day -> Visitor. Every
+        # user - logged in or anonymous - signs the same guestbook.
         today = _today();
-        days = [d for d in [here-->[?:Day]] if d.date == today];
-        day = days[0] if days else (here +>: OnDay() :+> Day(date=today))[0];
+        days = [d for d in [root.shared-->[?:Day]] if d.date == today];
+        day = days[0] if days
+            else (root.shared +>: OnDay() :+> Day(date=today))[0];
         day +>: Signed() :+> Visitor(
             name=self.name, message=self.message
         );

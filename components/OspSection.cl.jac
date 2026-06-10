@@ -11,19 +11,20 @@ import from .CodeBlock { CodeBlock }
 import from .SectionShell { SectionShell }
 sv import from ..guestbook { GraphSnapshot }
 
-glob _CODE: str = """# Signatures are grouped by date: root -> Day -> Visitor,
-# all real graph data, not a fixture.
+glob _CODE: str = """# Signatures are grouped by date: root.shared -> Day -> Visitor,
+# all real graph data, not a fixture. `root.shared` is the public
+# graph every anonymous request runs on - one walk reads it all.
 node Day { has date: str; }
 node Visitor { has name: str, message: str; }
 edge OnDay {}  edge Signed {}
 
-# The walker starts at root and reacts at each node type it
-# lands on. Traversal is `visit`, never a hand-rolled loop.
+# The walker starts at the shared root and reacts at each node
+# type it lands on. Traversal is `visit`, never a hand-rolled loop.
 walker:pub explore_graph {
     has path: list[str] = [];
 
     can run with `root entry {
-        visit [-->[?:Day]];            # step onto the day nodes
+        visit [root.shared-->[?:Day]]; # step onto the day nodes
     }
     can walk_day with Day entry {
         visit [-->[?:Visitor]];        # then each day's signatures

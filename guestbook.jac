@@ -3,10 +3,12 @@
 Two demos run against a real persistent graph:
 
   - **Guestbook** - every signature is a `Visitor` node grouped under a `Day`
-    node for the date it was signed: `root -> Day -> Visitor`. `get_guestbook`
-    fans out across all roots, descends each day, and gathers them. Data lives
-    in the graph; it survives restarts.
-  - **Graph traversal** - `explore_graph` walks the REAL graph from the root,
+    node for the date it was signed: `root.shared -> Day -> Visitor`. ALL
+    signatures live on `root.shared` (the public graph anonymous requests run
+    on), so any user - logged in or not - signs and reads the SAME guestbook
+    with one walk: no `allroots()` fan-out. Data lives in the graph; it
+    survives restarts.
+  - **Graph traversal** - `explore_graph` walks the REAL shared graph,
     crossing each `Day` and the `Visitor`s under it, recording the order it
     crossed them, so the client draws the actual live topology (no demo data).
 
@@ -93,11 +95,14 @@ walker:pub sign_guestbook {
         if not self.message.strip() {
             return;
         }
+        # Every signature hangs off the SHARED root - the commons every
+        # user can read and attach to by default, logged in or not.
         # Walk into today's Day node, creating it on the day's first sign. The
         # `else` fires when the visit enqueues nothing (no Day for today yet).
         today = _today();
-        visit [here-->[?:Day, date == today]] else {
-            fresh_day = here +>: OnDay() :+> Day(date=today);
+        visit [root.shared-->[?:Day, date == today]] else {
+            fresh_day = root.shared +>: OnDay() :+> Day(date=today);
+            # Day is a container: others attach their signatures under it.
             grant(fresh_day[0], level=ConnectPerm);
             visit fresh_day;
         }
@@ -110,20 +115,21 @@ walker:pub sign_guestbook {
             message=self.message.strip()[:200],
             created_at=_now()
         );
-        grant(fresh[0], level=ConnectPerm);
+        # A signature is a leaf: everyone may read it, only its author
+        # (and the walkers the author runs) may change it.
+        grant(fresh[0], level=ReadPerm);
         report fresh[0].to_view();
     }
 }
 
 walker:pub get_guestbook {
     has results: list[GuestEntry] = [],
-        seen: dict[str, bool] = {},
         reports: list[list[GuestEntry]] = [];
 
     can run with Root entry {
-        for r in allroots() {
-            visit [r-->[?:Day]];
-        }
+        # One graph, one walk: every signature lives under `root.shared`,
+        # the commons that is readable and attachable by default.
+        visit [root.shared-->[?:Day]];
     }
 
     can descend with Day entry {
@@ -131,11 +137,7 @@ walker:pub get_guestbook {
     }
 
     can gather with Visitor entry {
-        vid = jid(here);
-        if vid not in self.seen {
-            self.seen[vid] = True;
-            self.results.append(here.to_view());
-        }
+        self.results.append(here.to_view());
     }
 
     can deliver with Root exit {
@@ -150,10 +152,8 @@ walker:pub get_guestbook {
 # in the result prove they are not the same process.
 def:pub guestbook_stats() -> dict {
     signatures = 0;
-    for r in allroots() {
-        for day in [r-->[?:Day]] {
-            signatures += len([day-->[?:Visitor]]);
-        }
+    for day in [root.shared-->[?:Day]] {
+        signatures += len([day-->[?:Visitor]]);
     }
     # cross-process call -> separate process. An sv->sv import lowers to a
     # synchronous stub (the runtime routes to analytics' process), so the call
@@ -168,7 +168,7 @@ def:pub guestbook_stats() -> dict {
 }
 
 # ─── Graph traversal (real data) ─────────────────────────────────────────────
-# Walk the real graph from the root: visit every Visitor the guestbook created,
+# Walk the real shared graph: visit every Visitor the guestbook created,
 # recording the visit order + the root->visitor edges, so the OSP section draws
 # the actual live topology. No synthetic/demo nodes.
 walker:pub explore_graph {
@@ -180,11 +180,11 @@ walker:pub explore_graph {
         reports: list[GraphSnapshot] = [];
 
     can run with Root entry {
-        self.rid = jid(here);
+        self.rid = jid(root.shared);
         self.nodes.append(GraphNodeView(id=self.rid, label="root", kind="root"));
         self.path.append(self.rid);
-        self.log.append("walker spawned at root");
-        visit [-->[?:Day]];
+        self.log.append("walker spawned at the shared root");
+        visit [root.shared-->[?:Day]];
     }
 
     can walk_day with Day entry {
