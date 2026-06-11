@@ -32,7 +32,7 @@ def:pub HeroSection -> JsxElement {
                 <p
                     className="mt-6 max-w-2xl text-balance text-xl text-muted-foreground"
                 >
-                    "This language shouldn't exist."
+                    "This language shouldn't be possible."
                 </p>
                 <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
                     <a href="#fullstack">

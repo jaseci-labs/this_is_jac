@@ -25,7 +25,7 @@ def:pub GraphView(refreshKey: int = 0) -> JsxElement {
                 </a>
             </div>
             <iframe
-                src={"/graph?v=" + str(refreshKey)}
+                src={"/graph?public=1&v=" + str(refreshKey)}
                 title="Jac Graph Visualizer"
                 className="h-[440px] w-full border-0 bg-background"
             />
@@ -34,8 +34,8 @@ def:pub GraphView(refreshKey: int = 0) -> JsxElement {
             >
                 This is the <span className="text-foreground">public graph</span> -
                 the Day and Visitor nodes the guestbook above writes, each signature
-                grouped under the day it was signed. Logged-in littleX accounts get
-                their own graph here.
+                grouped under the day it was signed. Logged into littleX? Hit
+                "open" to see your own user graph in a full tab.
             </p>
         </div>;
 }
