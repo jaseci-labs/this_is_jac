@@ -30,34 +30,33 @@ def:pub ByllmSection -> JsxElement {
             id="ai"
             eyebrow="AI-native"
             title="Functions powered by an LLM"
-            subtitle="Write the signature, write `by llm()`, and the model becomes the implementation - returning typed, validated objects, not loose text."
+            subtitle="Write the signature, write `by llm()`, and the model becomes the implementation - returning typed, validated objects, not loose text. Nothing to run here because tokens cost $$$ (for now ;-) :-) :-))."
         >
             <div className="grid items-center gap-8 lg:grid-cols-2">
                 <CodeBlock code={_CODE} filename="triage.jac"/>
-
                 <Card className="border-border bg-card/60">
                     <CardContent className="flex flex-col gap-4 p-6">
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <div
+                            className="flex items-center gap-2 text-sm text-muted-foreground"
+                        >
                             <Sparkles size={15} className="text-primary"/>
                             triage(message) call
                         </div>
-
                         <div
                             className="rounded-lg border border-border bg-background/60 p-4 font-mono text-sm text-foreground"
                         >
-                            "the checkout page 500s every time I hit pay,
-                            losing sales right now!!"
+                            "the checkout page 500s every time I hit pay, losing sales right now!!"
                         </div>
-
                         <div className="flex justify-center text-muted-foreground">
                             <ArrowRight size={18} className="rotate-90"/>
                         </div>
-
                         <div
                             className="flex flex-col gap-3 rounded-lg border border-primary/30 bg-primary/5 p-4"
                         >
                             <div className="flex items-center justify-between">
-                                <span className="font-mono text-xs text-muted-foreground">
+                                <span
+                                    className="font-mono text-xs text-muted-foreground"
+                                >
                                     Ticket
                                 </span>
                                 <Badge className="bg-destructive/15 text-destructive">
@@ -70,7 +69,9 @@ def:pub ByllmSection -> JsxElement {
                                     "Checkout returns 500 on payment"
                                 </span>
                             </div>
-                            <div className="flex flex-wrap items-center gap-2 font-mono text-sm">
+                            <div
+                                className="flex flex-wrap items-center gap-2 font-mono text-sm"
+                            >
                                 <span className="text-muted-foreground">tags:</span>
                                 {[
                                     <Badge

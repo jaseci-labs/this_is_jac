@@ -48,8 +48,8 @@ cl def Composer -> JsxElement {
         <SectionShell
             id="littlex"
             eyebrow="Real apps"
-            title="Fully Implemented Twitter-like App"
-            subtitle="All frontend/backend interfacing, data handling, and db organization is abstracted away (done for you and optimized by the compiler)."
+            title="Below is Real Twitter-like App. Use It."
+            subtitle="In a single component. All frontend/backend interfacing, data handling, and db organization is abstracted away (done for you and optimized by the compiler)."
         >
             <div className="mx-auto max-w-5xl">
                 <div

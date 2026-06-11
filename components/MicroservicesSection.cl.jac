@@ -53,15 +53,19 @@ def:pub ProcBox(label: str, sub: str, pid: str, icon: any, accent: bool) -> JsxE
     return
         <div
             className={"flex flex-1 flex-col items-center gap-1 rounded-xl border p-4 text-center " + (
-                "border-primary/40 bg-primary/10" if accent else "border-border bg-card/60"
+                "border-primary/40 bg-primary/10"
+                    if accent
+                    else "border-border bg-card/60"
             )}
         >
-            <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                {icon}
-                {label}
+            <div
+                className="flex items-center gap-2 text-sm font-semibold text-foreground"
+            >
+                {icon}{label}
             </div>
             <div className="font-mono text-xs text-muted-foreground">
-                pid <span className="text-primary">{pid}</span>
+                pid{" "}
+                <span className="text-primary">{pid}</span>
             </div>
             <div className="font-mono text-[0.65rem] text-muted-foreground/70">
                 {sub}
@@ -83,18 +87,19 @@ def:pub MicroservicesSection(
         <SectionShell
             id="microservices"
             eyebrow="Microservices"
-            title="One import is a service boundary"
-            subtitle="`guestbook.jac` serves its walkers to the browser AND, via one relative `sv import from .analytics`, calls a microservice. The runtime spawns analytics as its own process and routes the call - no HTTP client, no serializers, no service URL. Run it: the two process ids prove the processes are separate - then the same import STREAMS, and the analytics commentary arrives word by word over SSE."
+            title="One import is a Microservice boundary"
+            subtitle="One relative `sv import from .analytics`, specifies a microservice. Done. Typechecked acrross. The runtime spawns analytics as its own process and routes the call - no HTTP client, no serializers, no service URL. This is real, Click the button. Watch the same import STREAM, and the analytics commentary arrives word by word over SSE."
         >
             <div className="mx-auto max-w-5xl">
                 <div className="grid items-stretch gap-4 lg:grid-cols-2">
                     <CodeBlock filename="guestbook.jac" code={_CONSUMER} dense={True}/>
                     <CodeBlock filename="analytics.jac" code={_PROVIDER} dense={True}/>
                 </div>
-
                 <div className="mt-4 rounded-xl border border-border bg-card/60 p-6">
                     <div className="mb-4 flex items-center justify-between">
-                        <span className="flex items-center gap-2 text-sm font-medium text-foreground">
+                        <span
+                            className="flex items-center gap-2 text-sm font-medium text-foreground"
+                        >
                             <Boxes size={15} className="text-primary"/>
                             Live cross-process call
                         </span>
@@ -108,7 +113,6 @@ def:pub MicroservicesSection(
                             {"Calling..." if running else "Run guestbook_stats"}
                         </Button>
                     </div>
-
                     <div className="flex items-center gap-2">
                         <ProcBox
                             label="guestbook"
@@ -117,50 +121,67 @@ def:pub MicroservicesSection(
                             icon={<Server size={15} className="text-primary"/>}
                             accent={False}
                         />
-                        <div className="flex shrink-0 flex-col items-center text-muted-foreground">
+                        <div
+                            className="flex shrink-0 flex-col items-center text-muted-foreground"
+                        >
                             <ArrowRight size={20}/>
                             <span className="font-mono text-[0.65rem]">sv import</span>
                         </div>
                         <ProcBox
                             label="analytics"
-                            sub="auto-spawned process"
+                            sub="auto-spawned microservice"
                             pid={apid}
                             icon={<Cpu size={15} className="text-primary"/>}
                             accent={True}
                         />
                     </div>
-
                     {if stats {
-                        <div className="mt-4 rounded-lg border border-border bg-background/50 p-3 text-sm">
+                        <div
+                            className="mt-4 rounded-lg border border-border bg-background/50 p-3 text-sm"
+                        >
                             <div className="text-muted-foreground">
                                 analytics computed a reach score of{" "}
-                                <span className="font-mono font-bold text-primary">{stats["score"]}</span>
-                                {" "}over{" "}
-                                <span className="font-mono text-foreground">{stats["signatures"]}</span>
-                                {" "}guestbook signatures.
+                                <span className="font-mono font-bold text-primary">
+                                    {stats["score"]}
+                                </span>{" "}
+                                over{" "}
+                                <span className="font-mono text-foreground">
+                                    {stats["signatures"]}
+                                </span>{" "}
+                                guestbook signatures.
                             </div>
                             <div className="mt-1 text-xs text-muted-foreground">
-                                {"Two different PIDs - analytics ran in a separate process the runtime spawned from one sv import." if stats["gateway_pid"] != stats["analytics_pid"] else "Same PID (in-process)."}
+                                {"Two different PIDs - analytics ran in a separate process the runtime spawned from one sv import."
+                                    if stats["gateway_pid"] != stats["analytics_pid"]
+                                    else "Same PID (in-process)."}
                             </div>
                         </div>
                     } else {
-                        <div className="mt-4 rounded-lg border border-border bg-background/50 p-3 text-center text-sm text-muted-foreground">
-                            Run it - the guestbook server forwards your live signature count to the analytics service and reports both process ids.
+                        <div
+                            className="mt-4 rounded-lg border border-border bg-background/50 p-3 text-center text-sm text-muted-foreground"
+                        >
+                            Run it - the guestbook server forwards your live signature count to the analytics microservice and reports both process ids.
                         </div>
-                    }}
-
+                    } }
                     {if storyOn or story != "" {
-                        <div className="mt-4 rounded-lg border border-primary/30 bg-primary/[0.05] p-4">
+                        <div
+                            className="mt-4 rounded-lg border border-primary/30 bg-primary/[0.05] p-4"
+                        >
                             <div
                                 className="mb-2 flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-wider text-primary"
                             >
-                                <Radio size={13} className={"animate-pulse" if storyOn else ""}/>
+                                <Radio
+                                    size={13}
+                                    className={"animate-pulse" if storyOn else ""}
+                                />
                                 streaming live from the analytics process - one SSE frame per word
                             </div>
                             <p className="text-sm leading-relaxed text-foreground/85">
                                 {story}
                                 {if storyOn {
-                                    <span className="animate-pulse text-primary">▍</span>
+                                    <span className="animate-pulse text-primary">
+                                        ▍
+                                    </span>
                                 }}
                             </p>
                         </div>

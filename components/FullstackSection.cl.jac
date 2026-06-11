@@ -27,7 +27,7 @@ edge OnDay {}  edge Signed {}
 walker:pub explore_graph {
     has path: list[str] = [];
 
-    can run with `root entry {
+    can run with Root entry {
         visit [root.shared-->[?:Day]]; # step onto the day nodes
     }
     can walk_day with Day entry {
@@ -52,7 +52,7 @@ def:pub FullstackSection(
         <SectionShell
             id="fullstack"
             eyebrow="Fullstack"
-            title="Never Use Another Graph Library Again"
+            title="Introducing a New Paradigm, for a New Way of Problem Solving."
             subtitle="Use graph centric PL semantics to solve problems in an intuitive and elegant way. Sign below and it's persisted to a real graph."
         >
             <div>

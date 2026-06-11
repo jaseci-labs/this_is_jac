@@ -37,6 +37,10 @@ import from "libm.so.6" {
     def sqrt(x: f64) -> f64;
 }""";
 
+glob _JAC_CODE: str = """import from .guestbook { GuestEntry }
+import from .components.Nav { Nav }
+sv import from .analytics { analyze }""";
+
 """Every shippable thing the SAME module compiles to - one box per project kind
 from the docs' "What You Can Build" page, each tagged with the verb that builds
 it. The accent groups them: backend/CLI (sky), native (orange), packages (rose),
@@ -103,7 +107,7 @@ glob _BUILDS: list[dict] = [
              "icon": <Monitor size={15}/>
          },
          {
-             "name": "Mobile app",
+             "name": "Mobile app (webview iOS/Android)",
              "cmd": "jac build --client mobile",
              "accent": "bg-violet-400/15 text-violet-400",
              "icon": <Smartphone size={15}/>
@@ -196,13 +200,13 @@ def:pub InteropSection -> JsxElement {
             id="interop"
             eyebrow="Interop"
             title="Import anything, link anything, build anything."
-            subtitle="One .jac module imports straight from Python and npm and links any C-ABI library by name. No generated bindings, no FFI boilerplate, no glue layer."
+            subtitle="One .jac module imports straight from Python, npm, and other Jac modules - and links any C-ABI library by name. No generated bindings, no FFI boilerplate, no glue layer."
         >
             <div className="mx-auto max-w-5xl">
-                <div className="grid gap-4 sm:grid-cols-3">
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     <EcoCard
                         name="Python"
-                        sub="PyPI packages + local .py / .jac files"
+                        sub="PyPI packages + local .py files"
                         code={_PY_CODE}
                         accent="bg-sky-400/15 text-sky-400"
                         icon={<Boxes size={18}/>}
@@ -218,8 +222,15 @@ def:pub InteropSection -> JsxElement {
                         name="C-ABI FFI"
                         sub="any .so / .dylib / .dll, by logical name"
                         code={_C_CODE}
-                        accent="bg-primary/15 text-primary"
+                        accent="bg-violet-400/15 text-violet-400"
                         icon={<Cpu size={18}/>}
+                    />
+                    <EcoCard
+                        name="Jac"
+                        sub="your .jac modules - any target, even services"
+                        code={_JAC_CODE}
+                        accent="bg-primary/15 text-primary"
+                        icon={<span className="font-mono text-sm font-bold">J</span>}
                     />
                 </div>
                 <svg
@@ -230,7 +241,7 @@ def:pub InteropSection -> JsxElement {
                 >
                     <path
                         className="tij-flow"
-                        d="M100,2 C100,42 300,22 300,62"
+                        d="M75,2 C75,42 300,22 300,62"
                         fill="none"
                         stroke="var(--primary)"
                         strokeOpacity={0.55}
@@ -238,7 +249,7 @@ def:pub InteropSection -> JsxElement {
                     />
                     <path
                         className="tij-flow"
-                        d="M300,2 L300,62"
+                        d="M225,2 C225,42 300,30 300,62"
                         fill="none"
                         stroke="var(--primary)"
                         strokeOpacity={0.55}
@@ -246,7 +257,15 @@ def:pub InteropSection -> JsxElement {
                     />
                     <path
                         className="tij-flow"
-                        d="M500,2 C500,42 300,22 300,62"
+                        d="M375,2 C375,42 300,30 300,62"
+                        fill="none"
+                        stroke="var(--primary)"
+                        strokeOpacity={0.55}
+                        strokeWidth={2}
+                    />
+                    <path
+                        className="tij-flow"
+                        d="M525,2 C525,42 300,22 300,62"
                         fill="none"
                         stroke="var(--primary)"
                         strokeOpacity={0.55}

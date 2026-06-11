@@ -28,7 +28,7 @@ def:pub narrate(signatures: int) -> Generator {
     pid = os.getpid();
     plural = "s" if signatures != 1 else "";
     text = (
-        f"Analytics speaking - process {pid}, live over SSE. "
+        f"Analytics speaking - process {pid}, a separate HTTP process, live over SSE. "
         f"The gateway just handed me {signatures} signature{plural} from a walk "
         "of the shared guestbook graph. Every word you are reading left my "
         "process as its own server-sent event, was re-streamed by the guestbook "

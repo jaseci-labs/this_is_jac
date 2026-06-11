@@ -15,11 +15,21 @@ glob _ROOT_LABEL: str = "this_is_jac";
 
 """Tailwind text colour for a language, used on badges and active file icons."""
 def _lang_color(lang: str) -> str {
-    if lang == "Jac" { return "text-primary"; }
-    if lang == "Python" { return "text-sky-300"; }
-    if lang == "CSS" { return "text-violet-300"; }
-    if lang == "TOML" or lang == "JSON" { return "text-amber-300"; }
-    if lang == "Markdown" { return "text-emerald-300"; }
+    if lang == "Jac" {
+        return "text-primary";
+    }
+    if lang == "Python" {
+        return "text-sky-300";
+    }
+    if lang == "CSS" {
+        return "text-violet-300";
+    }
+    if lang == "TOML" or lang == "JSON" {
+        return "text-amber-300";
+    }
+    if lang == "Markdown" {
+        return "text-emerald-300";
+    }
     return "text-sky-300";
 }
 
@@ -44,7 +54,11 @@ def:pub SourceViewer(
     # subdirectory paths (analytics.jac < assets/... < capture.jac), so bucket
     # by dir (first-appearance order) rather than assuming contiguity.
     q = query.strip().lower();
-    filtered = [f for f in files if q == "" or q in f["path"].lower()];
+    filtered = [
+        f
+        for f in files
+        if q == "" or q in f["path"].lower()
+    ];
     buckets: dict = {};
     dirOrder: list[str] = [];
     for f in filtered {
@@ -73,8 +87,8 @@ def:pub SourceViewer(
         <SectionShell
             id="source"
             eyebrow="Open source"
-            title="Read this site's own source"
-            subtitle="Every pixel you have scrolled is Jac - client, server, and native, in one project. Browse the actual files below, highlighted server-side by Jac's own lexer - the same grammar the docs use."
+            title="This Demo is One Typechecked Jac Program. Let Me Prove It."
+            subtitle="Every pixel you have scrolled is Jac - client, server, and native, in one project. Browse the actual files below, I'd recommend checking out analytics.jac, main.jac, social_graph.jac, etc."
         >
             <div className="mx-auto max-w-6xl">
                 <div
@@ -83,15 +97,22 @@ def:pub SourceViewer(
                     <div
                         className="flex max-h-[600px] min-h-[440px] flex-col border-b border-border lg:border-b-0 lg:border-r"
                     >
-                        <div className="flex items-center gap-2 border-b border-border/70 px-3 py-2.5">
-                            <Search size={14} className="shrink-0 text-muted-foreground"/>
+                        <div
+                            className="flex items-center gap-2 border-b border-border/70 px-3 py-2.5"
+                        >
+                            <Search
+                                size={14}
+                                className="shrink-0 text-muted-foreground"
+                            />
                             <input
                                 value={query}
                                 onChange={lambda e: ChangeEvent { query = e.target.value; }}
                                 placeholder="Filter files..."
                                 className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
                             />
-                            <span className="shrink-0 font-mono text-[10px] text-muted-foreground">
+                            <span
+                                className="shrink-0 font-mono text-[10px] text-muted-foreground"
+                            >
                                 {len(filtered)}
                             </span>
                         </div>
@@ -102,41 +123,63 @@ def:pub SourceViewer(
                                         className="flex items-center gap-1.5 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70"
                                     >
                                         <Folder size={11} className="shrink-0"/>
-                                        <span className="truncate">{g["dir"] or _ROOT_LABEL}</span>
+                                        <span className="truncate">
+                                            {g["dir"] or _ROOT_LABEL}
+                                        </span>
                                     </div>
                                     {[
                                         <button
                                             key={f["path"]}
-                                            onClick={lambda { active = f["path"]; onOpen(f["path"]); }}
+                                            onClick={lambda {
+                                                active = f["path"];
+                                                onOpen(f["path"]);
+                                            }}
                                             className={"flex w-full items-center gap-2 px-3 py-1 text-left text-[13px] transition " + (
-                                                "bg-primary/15 text-foreground" if f["path"] == active else "text-muted-foreground hover:bg-white/5 hover:text-foreground"
+                                                "bg-primary/15 text-foreground"
+                                                    if f["path"] == active
+                                                    else "text-muted-foreground hover:bg-white/5 hover:text-foreground"
                                             )}
                                         >
                                             <FileCode2
                                                 size={13}
-                                                className={"shrink-0 " + (_lang_color(f["lang"]) if f["path"] == active else "text-muted-foreground/50")}
+                                                className={"shrink-0 " + (
+                                                    _lang_color(f["lang"])
+                                                        if f["path"] == active
+                                                        else "text-muted-foreground/50"
+                                                )}
                                             />
-                                            <span className="truncate">{f["name"]}</span>
-                                        </button>
-                                        for f in g["files"]
+                                            <span className="truncate">
+                                                {f["name"]}
+                                            </span>
+                                        </button> for f in g["files"]
                                     ]}
-                                </div>
-                                for g in groups
+                                </div> for g in groups
                             ]}
                         </div>
                     </div>
-
                     <div className="flex max-h-[600px] min-w-0 flex-col bg-[#0c0e14]">
-                        <div className="flex items-center gap-2 border-b border-border/70 px-4 py-2.5">
-                            <span className="size-3 shrink-0 rounded-full bg-[#ff5f57]"/>
-                            <span className="size-3 shrink-0 rounded-full bg-[#febc2e]"/>
-                            <span className="size-3 shrink-0 rounded-full bg-[#28c840]"/>
-                            <span className="ml-2 truncate font-mono text-xs text-muted-foreground">
+                        <div
+                            className="flex items-center gap-2 border-b border-border/70 px-4 py-2.5"
+                        >
+                            <span
+                                className="size-3 shrink-0 rounded-full bg-[#ff5f57]"
+                            />
+                            <span
+                                className="size-3 shrink-0 rounded-full bg-[#febc2e]"
+                            />
+                            <span
+                                className="size-3 shrink-0 rounded-full bg-[#28c840]"
+                            />
+                            <span
+                                className="ml-2 truncate font-mono text-xs text-muted-foreground"
+                            >
                                 {curPath or "—"}
                             </span>
                             {if curLang {
                                 <span
-                                    className={"ml-1 shrink-0 rounded-md border border-border/60 px-1.5 py-0.5 font-mono text-[10px] " + _lang_color(curLang)}
+                                    className={"ml-1 shrink-0 rounded-md border border-border/60 px-1.5 py-0.5 font-mono text-[10px] " + _lang_color(
+                                        curLang
+                                    )}
                                 >
                                     {curLang}
                                 </span>
@@ -150,13 +193,15 @@ def:pub SourceViewer(
                                     <Check size={13} className="text-emerald-400"/>
                                 } else {
                                     <Copy size={13}/>
-                                }}
+                                } }
                                 {"Copied" if copied else "Copy"}
                             </button>
                         </div>
                         <div className="relative flex-1 overflow-y-auto">
                             {if curErr {
-                                <div className="p-8 text-center text-sm text-muted-foreground">
+                                <div
+                                    className="p-8 text-center text-sm text-muted-foreground"
+                                >
                                     {curErr}
                                 </div>
                             } elif curHtml {
@@ -176,11 +221,13 @@ def:pub SourceViewer(
                                     </pre>
                                 </div>
                             } else {
-                                <div className="flex h-full items-center justify-center gap-2 p-8 text-sm text-muted-foreground">
+                                <div
+                                    className="flex h-full items-center justify-center gap-2 p-8 text-sm text-muted-foreground"
+                                >
                                     <Code2 size={16}/>
                                     Select a file to view its source
                                 </div>
-                            }}
+                            }  }
                             {if loading {
                                 <div
                                     className="absolute inset-0 flex items-center justify-center bg-[#0c0e14]/60 backdrop-blur-[1px]"

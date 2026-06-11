@@ -33,8 +33,8 @@ def:pub WasmShooterSection -> JsxElement {
         <SectionShell
             id="wasm"
             eyebrow="WebAssembly"
-            title="Oh, We can inline here, because... WASM."
-            subtitle="No source changes - `jac build` compiles the na {} block to WebAssembly and the raylib externs become wasm imports, satisfied by a WebGL shim. Click to load the module and play."
+            title="Oh, you can play it here, because... WASM!"
+            subtitle="This tech demo integrates and typechecks across native jac to WebAssembly and the raylib externs via wasm imports, satisfied by a WebGL shim. Click to load the module and play."
         >
             <div className="mx-auto max-w-4xl">
                 <div
