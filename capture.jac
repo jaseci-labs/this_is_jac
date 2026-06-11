@@ -168,16 +168,16 @@ obj CaptureRunner {
 
     # ── 2. Screenshot (via the shooter's own raylib TakeScreenshot) ───────────
     """A frame with almost no distinct colors means the GL framebuffer couldn't
-    be read (e.g. WSLg/llvmpipe, where neither an external grab nor glReadPixels
-    sees the rendered surface). A real shooter frame - grid + shaded cubes + FPS
-    text - has far more. Best-effort: with no `identify` available we accept it."""
+    be read back. The real shooter frame is deliberately flat-shaded - black sky,
+    grid lines, solid cubes, FPS text - so it only has ~6 distinct colors; a
+    failed readback has 1-2. Best-effort: with no `identify` available we accept."""
     def _looks_blank(path: str) -> bool {
         try {
             r = subprocess.run(
                 ["identify", "-format", "%k", path],
                 capture_output=True, text=True, timeout=15
             );
-            return int(r.stdout.strip()) < 32;
+            return int(r.stdout.strip()) < 3;
         } except Exception as e {
             return False;
         }
@@ -189,14 +189,14 @@ obj CaptureRunner {
     The engine writes the PNG from its own GL framebuffer, so this needs no
     external window grab and works on any display server that can actually read
     that buffer back."""
-    def capture_self(outname: str) -> None {
+    def capture_self(outname: str, bin_name: str) -> None {
         if not SHOOTER_DIR {
             self.record(outname, "skip", "raylib_shooter not found");
             return;
         }
-        bin_path = os.path.join(SHOOTER_DIR, "shooter");
+        bin_path = os.path.join(SHOOTER_DIR, bin_name);
         if not os.path.exists(bin_path) {
-            self.record(outname, "skip", "shooter not built (run without --skip-bench first)");
+            self.record(outname, "skip", f"{bin_name} not built (run without --skip-bench first)");
             return;
         }
         shot_file = os.path.join(SHOOTER_DIR, ".screenshot");
@@ -208,28 +208,43 @@ obj CaptureRunner {
         if os.path.exists(produced) {
             os.remove(produced);
         }
-        with open(shot_file, "w") as f {
-            f.write("60");
+        # Two attempts: the platform's native GL first, then Mesa software
+        # rendering (llvmpipe) - on WSLg the D3D12-backed driver renders fine
+        # but glReadPixels comes back blank, while llvmpipe reads back exactly
+        # what it drew. Same real game either way.
+        attempts: list[dict[str, str]] = [{}, {"LIBGL_ALWAYS_SOFTWARE": "1"}];
+        got = False;
+        for extra_env in attempts {
+            with open(shot_file, "w") as f {
+                f.write("60");
+            }
+            if os.path.exists(produced) {
+                os.remove(produced);
+            }
+            run_env = dict(os.environ);
+            run_env.update(extra_env);
+            try {
+                subprocess.run(
+                    [bin_path], cwd=SHOOTER_DIR,
+                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                    timeout=60, env=run_env
+                );
+            } except Exception as e {
+                self.record(outname, "fail", f"{e}");
+            }
+            if os.path.exists(shot_file) {
+                os.remove(shot_file);
+            }
+            if os.path.exists(produced) and not self._looks_blank(produced) {
+                got = True;
+                break;
+            }
         }
-        try {
-            subprocess.run(
-                [bin_path], cwd=SHOOTER_DIR,
-                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                timeout=60
-            );
-        } except Exception as e {
-            self.record(outname, "fail", f"{e}");
-        }
-        if os.path.exists(shot_file) {
-            os.remove(shot_file);
-        }
-        if not os.path.exists(produced) {
-            self.record(outname, "skip", "binary produced no screenshot (no display/GL)");
-            return;
-        }
-        if self._looks_blank(produced) {
-            os.remove(produced);
-            self.record(outname, "skip", "blank frame (GL buffer unreadable, e.g. WSLg) - kept existing image");
+        if not got {
+            if os.path.exists(produced) {
+                os.remove(produced);
+            }
+            self.record(outname, "skip", "no readable frame (no display/GL) - kept existing image");
             return;
         }
         dst = os.path.join(CAPTURES, outname);
@@ -239,8 +254,9 @@ obj CaptureRunner {
     }
 
     def capture_screenshots -> None {
-        print(">> capturing native shooter screenshot via the engine's TakeScreenshot...");
-        self.capture_self("shooter_jac.png");
+        print(">> capturing native shooter screenshots via the engines' TakeScreenshot...");
+        self.capture_self("shooter_jac.png", "shooter");
+        self.capture_self("shooter_zig.png", "shooter_zig");
     }
 
     # ── 3. Manifest + summary ──────────────────────────────────────────────────

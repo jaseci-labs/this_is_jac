@@ -5,51 +5,9 @@ hand. Jac collapses every one of them into a single language. This section makes
 that visible: per seam, the conventional stack's joint vs Jac's one-thing."""
 
 import from "lucide-react" {
-    ArrowLeftRight, Database, Network, Boxes, Languages, Check, X, GitMerge,
-    Cpu, Server, Globe, Box
+    Database, Check, X, GitMerge, Cpu, Server, Globe, Box
 }
 import from .SectionShell { SectionShell }
-
-"""The five seams the non-Jac twin had to add back - each with the conventional
-pain on the left and the Jac collapse on the right."""
-glob _SEAMS: list[dict] = [
-    {
-        "icon": <ArrowLeftRight size={18}/>,
-        "title": "A client/server type boundary",
-        "without": "Client TypeScript types and server schemas, kept in sync by hand. They drift - and the drift is a runtime bug.",
-        "withjac": "One typed definition spans both sides. `await add_todo(...)` in the browser IS the server function - same types, no boundary to sync."
-    },
-    {
-        "icon": <Database size={18}/>,
-        "title": "An ORM and a migration system",
-        "without": "ORM models map objects to tables; Alembic migrations evolve the schema every time it changes.",
-        "withjac": "`root ++> Visitor(...)`. Persistence is the language - no tables, no ORM, no migrations to author or run."
-    },
-    {
-        "icon": <Network size={18}/>,
-        "title": "Build, proxy and CORS glue",
-        "without": "A Vite proxy, CORS rules, and env wiring tie the frontend to a separately-running backend.",
-        "withjac": "`jac serve`. One origin, one process - the client and the server are the same program."
-    },
-    {
-        "icon": <Cpu size={18}/>,
-        "title": "A native toolchain for WebAssembly",
-        "without": "A second language (C) and its toolchain - clang, wasm-ld - a separate build, and exports/imports hand-wired across the JS boundary.",
-        "withjac": "The `na {}` block is Jac, in the same file. `jac build` emits the `.wasm` - Jac ships its own LLVM and wasm linker, so there is no external toolchain."
-    },
-    {
-        "icon": <Boxes size={18}/>,
-        "title": "Two deploy units",
-        "without": "A frontend container and a backend container, plus nginx and Docker Compose to run them as one.",
-        "withjac": "One artifact. The runtime is the server - there is nothing to wire together to ship it."
-    },
-    {
-        "icon": <Languages size={18}/>,
-        "title": "Five languages",
-        "without": "TypeScript, Python, C, SQL and YAML - five toolchains, five mental models, five context switches.",
-        "withjac": "One language for the graph, the server, the browser, and the metal."
-    }
-];
 
 """A bottom-line collapse chip: `<from> -> <dest>`."""
 def:pub CollapseChip(from_: str, dest: str) -> JsxElement {
@@ -84,44 +42,6 @@ def:pub ProgBox(label: str, icon: any) -> JsxElement {
         </div>;
 }
 
-"""One seam row: the conventional joint (left, muted/destructive) collapsing into
-the Jac one-thing (right, primary)."""
-def:pub SeamCard(title: str, without: str, withjac: str, icon: any) -> JsxElement {
-    return
-        <div className="rounded-xl border border-border bg-card/60 p-5">
-            <div className="mb-4 flex items-center gap-3">
-                <span
-                    className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-primary"
-                >
-                    {icon}
-                </span>
-                <div className="font-display font-bold leading-tight text-foreground">
-                    {title}
-                </div>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-lg border border-destructive/25 bg-destructive/[0.06] p-3.5">
-                    <div
-                        className="mb-1.5 flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-wider text-destructive/80"
-                    >
-                        <X size={13}/>
-                        without jac
-                    </div>
-                    <p className="text-sm leading-relaxed text-muted-foreground">{without}</p>
-                </div>
-                <div className="rounded-lg border border-primary/30 bg-primary/[0.06] p-3.5">
-                    <div
-                        className="mb-1.5 flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-wider text-primary"
-                    >
-                        <Check size={13}/>
-                        with jac
-                    </div>
-                    <p className="text-sm leading-relaxed text-foreground/85">{withjac}</p>
-                </div>
-            </div>
-        </div>;
-}
-
 def:pub SeamsSection -> JsxElement {
     return
         <SectionShell
@@ -131,17 +51,6 @@ def:pub SeamsSection -> JsxElement {
             subtitle="We rebuilt this exact site without Jac - React, FastAPI, Postgres, a C/WASM module. The line count barely moved. But six seams reappeared - boundaries between systems you keep in sync by hand, where things drift and break. Jac collapses each into one language, one program."
         >
             <div className="mx-auto flex max-w-4xl flex-col gap-4">
-                {[
-                    <SeamCard
-                        key={s["title"]}
-                        title={s["title"]}
-                        without={s["without"]}
-                        withjac={s["withjac"]}
-                        icon={s["icon"]}
-                    />
-                    for s in _SEAMS
-                ]}
-
                 <div
                     className="mt-4 rounded-2xl border border-primary/40 bg-primary/[0.05] p-6 shadow-lg shadow-primary/10 md:p-8"
                 >

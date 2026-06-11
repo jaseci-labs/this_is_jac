@@ -31,7 +31,8 @@ def:pub NativeSection -> JsxElement {
         zigMax: float = 719.1,
         zigFrames: int = 3764,
         capturedAt: str = "",
-        jacShotOk: bool = True;
+        jacShotOk: bool = True,
+        zigShotOk: bool = True;
 
     can with entry {
         loadBench();
@@ -110,11 +111,11 @@ def:pub NativeSection -> JsxElement {
                 </Card>
             </div>
 
-            <div className="mt-8">
-                <div className="mx-auto max-w-2xl overflow-hidden rounded-xl border border-border bg-[#0b0e16]">
+            <div className="mt-8 grid gap-4 md:grid-cols-2">
+                <div className="overflow-hidden rounded-xl border border-border bg-[#0b0e16]">
                     <div className="flex items-center gap-2 border-b border-border/60 px-4 py-2 text-xs text-muted-foreground">
                         <Camera size={13}/>
-                        raylib cube shooter - Jac native (jac nacompile), captured by the engine itself
+                        Jac build (jac nacompile) - captured by the engine itself
                     </div>
                     {if jacShotOk {
                         <img
@@ -122,6 +123,25 @@ def:pub NativeSection -> JsxElement {
                             alt="Jac native raylib cube shooter"
                             className="aspect-[16/10] w-full object-cover"
                             onError={lambda { jacShotOk = False; }}
+                        />
+                    } else {
+                        <div className="flex aspect-[16/10] w-full flex-col items-center justify-center gap-2 text-muted-foreground">
+                            <Camera size={24} className="opacity-40"/>
+                            <span className="text-xs">run capture.jac to add a screenshot</span>
+                        </div>
+                    } }
+                </div>
+                <div className="overflow-hidden rounded-xl border border-border bg-[#0b0e16]">
+                    <div className="flex items-center gap-2 border-b border-border/60 px-4 py-2 text-xs text-muted-foreground">
+                        <Camera size={13}/>
+                        Zig twin (zig build-exe) - captured by the engine itself
+                    </div>
+                    {if zigShotOk {
+                        <img
+                            src="/static/captures/shooter_zig.png"
+                            alt="Zig twin raylib cube shooter"
+                            className="aspect-[16/10] w-full object-cover"
+                            onError={lambda { zigShotOk = False; }}
                         />
                     } else {
                         <div className="flex aspect-[16/10] w-full flex-col items-center justify-center gap-2 text-muted-foreground">
