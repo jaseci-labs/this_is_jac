@@ -9,6 +9,11 @@ One module, three worlds:
     object-spatial backend behind the guestbook + graph-traversal demos.
 """
 
+# Server-side: the streaming endpoint is consumed with a raw fetch reader on
+# the client (no RPC stub call), so register it explicitly by importing it at
+# the top level of the entry module.
+import from guestbook { guestbook_story }
+
 cl {
     import from .frontend { app as ClientApp }
 

@@ -19,12 +19,13 @@ entry`). Traversal is always `visit`, never a hand-rolled loop.
 
 import datetime;
 import os;
+import from typing { Generator }
 
 # Microservice boundary: one line. This module already serves its walkers to the
 # browser (cl->sv); this relative `sv import` ALSO makes it a server->server
 # consumer. The runtime spawns `analytics` as its own process the first time
 # `analyze(...)` is called and routes to it.
-sv import from .analytics { analyze, AnalyticsReport }
+sv import from .analytics { analyze, AnalyticsReport, narrate }
 
 def _now -> str {
     return datetime.datetime.now(datetime.UTC).replace(tzinfo=None).isoformat() + "Z";
@@ -165,6 +166,24 @@ def:pub guestbook_stats() -> dict {
         "analytics_pid": rep.pid,
         "score": rep.score
     };
+}
+
+# ─── Streaming microservice call: re-stream analytics' commentary ────────────
+# `narrate(...)` runs in the analytics process and yields one phrase at a time;
+# the sv->sv stub hands back a LIVE generator - one SSE frame per yield.
+# Re-yielding forwards each frame to the browser the moment it arrives: the
+# gateway sits in the middle of the stream without buffering it.
+def:pub guestbook_story() -> Generator {
+    signatures = 0;
+    for day in [root.shared-->[?:Day]] {
+        signatures += len([day-->[?:Visitor]]);
+    }
+    def stream -> Generator[str, None, None] {
+        for chunk in narrate(signatures) {
+            yield str(chunk);
+        }
+    }
+    report stream();
 }
 
 # ─── Graph traversal (real data) ─────────────────────────────────────────────

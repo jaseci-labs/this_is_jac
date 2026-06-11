@@ -5,23 +5,30 @@ the analytics microservice - which the runtime spawns as its OWN process on
 first call. The button runs it for real; the two distinct pids prove the
 processes are separate, and the analytics result comes back as a typed object."""
 
-import from "lucide-react" { Cpu, Server, ArrowRight, Boxes, Play }
+import from "lucide-react" { Cpu, Server, ArrowRight, Boxes, Play, Radio }
 import from .ui.button { Button }
 import from .CodeBlock { CodeBlock }
 import from .SectionShell { SectionShell }
 
 glob _CONSUMER: str = """# guestbook.jac - serves its walkers to the browser AND
 # consumes a microservice. One relative sv import is the whole integration.
-sv import from .analytics { analyze, AnalyticsReport }
+sv import from .analytics { analyze, narrate }
 
 def:pub guestbook_stats() -> dict {
-    signatures = count_real_signatures();   # walk the graph
-    rep = analyze(signatures);              # -> SEPARATE process
+    rep = analyze(count_signatures());      # -> SEPARATE process
     return {
         "gateway_pid": os.getpid(),         # this process
         "analytics_pid": rep.pid,           # the analytics process
-        "score": rep.score                  # typed AnalyticsReport, end to end
+        "score": rep.score                  # typed, end to end
     };
+}
+
+# The SAME import also streams: the sv->sv call returns a LIVE
+# generator (one SSE frame per yield) - re-yield it to the browser.
+def:pub guestbook_story() -> Generator {
+    for chunk in narrate(count_signatures()) {
+        yield chunk;                        # frame in, frame out
+    }
 }""";
 
 glob _PROVIDER: str = """# analytics.jac - the provider service.
@@ -31,6 +38,14 @@ obj AnalyticsReport { has pid: int, score: float; }
 def:pub analyze(signatures: int) -> AnalyticsReport {
     # runs in analytics' OWN process - pid proves it
     return AnalyticsReport(pid=os.getpid(), score=float(signatures) * 1.5);
+}
+
+# A generator def:pub IS a streaming endpoint: every yield leaves
+# this process as one server-sent event.
+def:pub narrate(signatures: int) -> Generator {
+    for word in commentary(signatures).split(" ") {
+        yield word + " ";                   # one SSE frame per word
+    }
 }""";
 
 """One labelled process box in the topology diagram."""
@@ -57,6 +72,8 @@ def:pub ProcBox(label: str, sub: str, pid: str, icon: any, accent: bool) -> JsxE
 def:pub MicroservicesSection(
     stats: dict | None,
     running: bool,
+    story: str,
+    storyOn: bool,
     onRun: Callable[[], None],
 ) -> JsxElement {
     gpid = str(stats["gateway_pid"]) if stats else "—";
@@ -67,7 +84,7 @@ def:pub MicroservicesSection(
             id="microservices"
             eyebrow="Microservices"
             title="One import is a service boundary"
-            subtitle="`guestbook.jac` serves its walkers to the browser AND, via one relative `sv import from .analytics`, calls a microservice. The runtime spawns analytics as its own process and routes the call - no HTTP client, no serializers, no service URL. Run it: the two process ids prove they are genuinely separate."
+            subtitle="`guestbook.jac` serves its walkers to the browser AND, via one relative `sv import from .analytics`, calls a microservice. The runtime spawns analytics as its own process and routes the call - no HTTP client, no serializers, no service URL. Run it: the two process ids prove the processes are separate - then the same import STREAMS, and the analytics commentary arrives word by word over SSE."
         >
             <div className="mx-auto max-w-5xl">
                 <div className="grid items-stretch gap-4 lg:grid-cols-2">
@@ -129,6 +146,23 @@ def:pub MicroservicesSection(
                     } else {
                         <div className="mt-4 rounded-lg border border-border bg-background/50 p-3 text-center text-sm text-muted-foreground">
                             Run it - the guestbook server forwards your live signature count to the analytics service and reports both process ids.
+                        </div>
+                    }}
+
+                    {if storyOn or story != "" {
+                        <div className="mt-4 rounded-lg border border-primary/30 bg-primary/[0.05] p-4">
+                            <div
+                                className="mb-2 flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-wider text-primary"
+                            >
+                                <Radio size={13} className={"animate-pulse" if storyOn else ""}/>
+                                streaming live from the analytics process - one SSE frame per word
+                            </div>
+                            <p className="text-sm leading-relaxed text-foreground/85">
+                                {story}
+                                {if storyOn {
+                                    <span className="animate-pulse text-primary">▍</span>
+                                }}
+                            </p>
                         </div>
                     }}
                 </div>

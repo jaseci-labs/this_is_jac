@@ -55,6 +55,8 @@ def:pub Showcase -> JsxElement {
         graphNonce: int = 0,
         microStats: dict | None = None,
         microRunning: bool = False,
+        story: str = "",
+        storyOn: bool = False,
         srcFiles: list[dict] = [],
         srcFile: dict | None = None,
         srcLoading: bool = False;
@@ -101,6 +103,8 @@ def:pub Showcase -> JsxElement {
                 <MicroservicesSection
                     stats={microStats}
                     running={microRunning}
+                    {story}
+                    {storyOn}
                     onRun={runStats}
                 />
                 <NativeSection/>
