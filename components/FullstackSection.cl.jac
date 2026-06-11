@@ -53,7 +53,7 @@ def:pub FullstackSection(
             id="fullstack"
             eyebrow="Fullstack"
             title="Introducing a New Paradigm, for a New Way of Problem Solving."
-            subtitle="Use graph centric PL semantics to solve problems in an intuitive and elegant way. Sign below and it's persisted to a real graph."
+            subtitle="Use graph centric PL semantics to solve problems in an intuitive and elegant way. Sign below and it's persisted to a real graph. (and yes, this is a secret weapon for agentic ai harness building, but thats for another demo ;-))"
         >
             <div>
                 <div className="grid items-start gap-8 lg:grid-cols-2">

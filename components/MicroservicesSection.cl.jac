@@ -15,10 +15,10 @@ glob _CONSUMER: str = """# guestbook.jac - serves its walkers to the browser AND
 sv import from .analytics { analyze, narrate }
 
 def:pub guestbook_stats() -> dict {
-    rep = analyze(count_signatures());      # -> SEPARATE process
+    rep = analyze(count_signatures());      # -> SEPARATE service
     return {
-        "gateway_pid": os.getpid(),         # this process
-        "analytics_pid": rep.pid,           # the analytics process
+        "gateway_pid": os.getpid(),         # this server
+        "analytics_pid": rep.pid,           # the analytics microservce
         "score": rep.score                  # typed, end to end
     };
 }
@@ -36,7 +36,7 @@ import os;
 obj AnalyticsReport { has pid: int, score: float; }
 
 def:pub analyze(signatures: int) -> AnalyticsReport {
-    # runs in analytics' OWN process - pid proves it
+    # runs in analytics' OWN service process - pid proves it
     return AnalyticsReport(pid=os.getpid(), score=float(signatures) * 1.5);
 }
 
@@ -88,7 +88,7 @@ def:pub MicroservicesSection(
             id="microservices"
             eyebrow="Microservices"
             title="One import is a Microservice boundary"
-            subtitle="One relative `sv import from .analytics`, specifies a microservice. Done. Typechecked acrross. The runtime spawns analytics as its own process and routes the call - no HTTP client, no serializers, no service URL. This is real, Click the button. Watch the same import STREAM, and the analytics commentary arrives word by word over SSE."
+            subtitle="One relative `sv import from .analytics`, specifies a microservice. Done. Typechecked acrross. The runtime spawns analytics as its own service and routes the call - The compiler generate HTTP APIs, serializers, service URL, etc. This is real, Click the button. Watch the same import STREAM, and the analytics commentary arrives word by word over SSE."
         >
             <div className="mx-auto max-w-5xl">
                 <div className="grid items-stretch gap-4 lg:grid-cols-2">

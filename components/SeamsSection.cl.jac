@@ -49,7 +49,7 @@ def:pub SeamsSection -> JsxElement {
             id="seams"
             eyebrow="Cohesion"
             title="Jac is the Antidote to Polyglot Complexity."
-            subtitle="We rebuilt this exact site without Jac - React, FastAPI, Postgres, a C/WASM module, etc. But six seams appeared - boundaries between systems you keep in sync by hand, where things drift and break. Jac collapses each into one language, one program, with one next generation compiler and runtime."
+            subtitle="We rebuilt this exact site without Jac - React, FastAPI, Postgres, a C/WASM module, etc. But six seams appeared - boundaries between systems you must keep in sync by hand, where things drift and break. Jac collapses each into one language, one program, with one next generation compiler and runtime."
         >
             <div className="mx-auto flex max-w-4xl flex-col gap-4">
                 <div

@@ -2,12 +2,12 @@
 so this lets visitors read its OWN source. The file list and per-file syntax
 highlighting both come from the `source_viewer.jac` server endpoints
 (`source_index.py` colours each file with Jac's canonical Pygments lexer - the
-same grammar the docs use). This component is the presentation layer: a grouped
-file tree on the left, a highlighted code pane with a line gutter on the right.
+same grammar the docs use). This component is the presentation layer: a collapsible
+directory tree on the left (expanded by default), a highlighted code pane with a line gutter on the right.
 Server state (`files` / `current` / `loading`) is owned by the frontend shell
 and passed in; `onOpen(path)` asks it to load a file."""
 
-import from "lucide-react" { Search, Copy, Check, FileCode2, Folder, Code2 }
+import from "lucide-react" { Search, Copy, Check, FileCode2, Folder, FolderOpen, Code2, ChevronDown, ChevronRight }
 import from .SectionShell { SectionShell }
 
 """Header label for the repo-root file group (files with no directory)."""
@@ -41,7 +41,8 @@ def:pub SourceViewer(
 ) -> JsxElement {
     has query: str = "",
         active: str = "",
-        copied: bool = False;
+        copied: bool = False,
+        collapsed: dict = {};
 
     # Keep the highlighted item in sync once a file finishes loading.
     can with [current] entry {
@@ -50,9 +51,10 @@ def:pub SourceViewer(
         }
     }
 
-    # Filter, then bucket by directory. Path-sort interleaves root files with
-    # subdirectory paths (analytics.jac < assets/... < capture.jac), so bucket
-    # by dir (first-appearance order) rather than assuming contiguity.
+    # Filter, then build a real directory TREE: bucket files by their dir,
+    # collect every ancestor directory, and flatten to indented rows honoring
+    # the collapsed set. Everything is expanded by default; a non-empty filter
+    # force-expands so matches are never hidden.
     q = query.strip().lower();
     filtered = [
         f
@@ -60,16 +62,58 @@ def:pub SourceViewer(
         if q == "" or q in f["path"].lower()
     ];
     buckets: dict = {};
-    dirOrder: list[str] = [];
+    dirset: dict = {};
     for f in filtered {
         d = f["dir"];
         if d not in buckets {
             buckets[d] = [];
-            dirOrder.append(d);
         }
         buckets[d].append(f);
+        while d != "" {
+            dirset[d] = True;
+            d = d.rsplit("/", 1)[0] if "/" in d else "";
+        }
     }
-    groups = [{"dir": d, "files": buckets[d]} for d in dirOrder];
+    coll = {} if q != "" else collapsed;
+    rows: list[dict] = [];
+    rows.append({"kind": "dir", "path": "", "name": _ROOT_LABEL, "depth": 0});
+    if not coll.get("", False) {
+        for f in buckets.get("", []) {
+            rows.append({"kind": "file", "file": f, "depth": 1});
+        }
+        for d in sorted(dirset.keys()) {
+            # Skip rows under any collapsed ancestor.
+            hidden = False;
+            a = d.rsplit("/", 1)[0] if "/" in d else "";
+            while a != "" {
+                if coll.get(a, False) {
+                    hidden = True;
+                }
+                a = a.rsplit("/", 1)[0] if "/" in a else "";
+            }
+            if hidden {
+                continue;
+            }
+            depth = d.count("/") + 1;
+            rows.append({
+                "kind": "dir",
+                "path": d,
+                "name": d.rsplit("/", 1)[-1],
+                "depth": depth
+            });
+            if not coll.get(d, False) {
+                for f in buckets.get(d, []) {
+                    rows.append({"kind": "file", "file": f, "depth": depth + 1});
+                }
+            }
+        }
+    }
+
+    toggleDir = lambda d: str {
+        nc = {**collapsed};
+        nc[d] = not collapsed.get(d, False);
+        collapsed = nc;
+    };
 
     curPath = current["path"] if current else "";
     curLang = current["lang"] if current else "";
@@ -118,42 +162,59 @@ def:pub SourceViewer(
                         </div>
                         <div className="flex-1 overflow-y-auto py-1">
                             {[
-                                <div key={g["dir"]} className="mb-1">
-                                    <div
-                                        className="flex items-center gap-1.5 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70"
+                                (
+                                    <button
+                                        key={"d:" + r["path"]}
+                                        onClick={lambda { toggleDir(r["path"]); }}
+                                        className="flex w-full items-center gap-1.5 px-3 py-1 text-left text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70 transition hover:bg-white/5 hover:text-foreground"
                                     >
-                                        <Folder size={11} className="shrink-0"/>
-                                        <span className="truncate">
-                                            {g["dir"] or _ROOT_LABEL}
-                                        </span>
-                                    </div>
-                                    {[
-                                        <button
-                                            key={f["path"]}
-                                            onClick={lambda {
-                                                active = f["path"];
-                                                onOpen(f["path"]);
-                                            }}
-                                            className={"flex w-full items-center gap-2 px-3 py-1 text-left text-[13px] transition " + (
-                                                "bg-primary/15 text-foreground"
-                                                    if f["path"] == active
-                                                    else "text-muted-foreground hover:bg-white/5 hover:text-foreground"
+                                        {[
+                                            <span key={i} className="w-3 shrink-0"/>
+                                            for i in range(r["depth"])
+                                        ]}
+                                        {if coll.get(r["path"], False) {
+                                            <ChevronRight size={11} className="shrink-0"/>
+                                        } else {
+                                            <ChevronDown size={11} className="shrink-0"/>
+                                        }}
+                                        {if coll.get(r["path"], False) {
+                                            <Folder size={11} className="shrink-0"/>
+                                        } else {
+                                            <FolderOpen size={11} className="shrink-0"/>
+                                        }}
+                                        <span className="truncate">{r["name"]}</span>
+                                    </button>
+                                    if r["kind"] == "dir"
+                                    else <button
+                                        key={r["file"]["path"]}
+                                        onClick={lambda {
+                                            active = r["file"]["path"];
+                                            onOpen(r["file"]["path"]);
+                                        }}
+                                        className={"flex w-full items-center gap-2 px-3 py-1 text-left text-[13px] transition " + (
+                                            "bg-primary/15 text-foreground"
+                                                if r["file"]["path"] == active
+                                                else "text-muted-foreground hover:bg-white/5 hover:text-foreground"
+                                        )}
+                                    >
+                                        {[
+                                            <span key={i} className="w-3 shrink-0"/>
+                                            for i in range(r["depth"])
+                                        ]}
+                                        <FileCode2
+                                            size={13}
+                                            className={"shrink-0 " + (
+                                                _lang_color(r["file"]["lang"])
+                                                    if r["file"]["path"] == active
+                                                    else "text-muted-foreground/50"
                                             )}
-                                        >
-                                            <FileCode2
-                                                size={13}
-                                                className={"shrink-0 " + (
-                                                    _lang_color(f["lang"])
-                                                        if f["path"] == active
-                                                        else "text-muted-foreground/50"
-                                                )}
-                                            />
-                                            <span className="truncate">
-                                                {f["name"]}
-                                            </span>
-                                        </button> for f in g["files"]
-                                    ]}
-                                </div> for g in groups
+                                        />
+                                        <span className="truncate">
+                                            {r["file"]["name"]}
+                                        </span>
+                                    </button>
+                                )
+                                for r in rows
                             ]}
                         </div>
                     </div>
