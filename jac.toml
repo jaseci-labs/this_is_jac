@@ -59,3 +59,13 @@ keywords = "jac jaseci fullstack object-spatial walkers native wasm byllm"
 author = "Jaseci Labs"
 theme_color = "#f97316"
 icon = "/static/assets/jac-logo.svg"
+
+[plugins.scale.microservices]
+enabled = true
+
+[plugins.scale.microservices.routes]
+guestbook = "/api/guestbook"
+source_viewer = "/api/source_viewer"
+
+[plugins.scale.microservices.client]
+entry = "main.jac"
