@@ -66,6 +66,7 @@ enabled = true
 [plugins.scale.microservices.routes]
 guestbook = "/api/guestbook"
 source_viewer = "/api/source_viewer"
+analytics = "/api/analytics"
 
 [plugins.scale.microservices.client]
 entry = "main.jac"
