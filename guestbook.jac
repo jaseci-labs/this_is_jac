@@ -104,7 +104,7 @@ walker:pub sign_guestbook {
         visit [root.shared-->[?:Day, date == today]] else {
             fresh_day = root.shared +>: OnDay() :+> Day(date=today);
             # Day is a container: others attach their signatures under it.
-            grant(fresh_day[0], level=ConnectPerm);
+            grant(fresh_day, level=ConnectPerm);
             visit fresh_day;
         }
     }
@@ -118,8 +118,8 @@ walker:pub sign_guestbook {
         );
         # A signature is a leaf: everyone may read it, only its author
         # (and the walkers the author runs) may change it.
-        grant(fresh[0], level=ReadPerm);
-        report fresh[0].to_view();
+        grant(fresh, level=ReadPerm);
+        report fresh.to_view();
     }
 }
 

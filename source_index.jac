@@ -62,24 +62,53 @@ def _lexer_for(path: str) -> any {
     }
 }
 
-"""Repo-tracked + untracked-non-ignored paths, relative to ROOT, sorted.
+"""Directory names that never hold viewable source (VCS, build output, deps).
+The filesystem-walk fallback prunes these so it mirrors what git's
+`--exclude-standard` drops for free."""
+glob _SKIP_DIRS: set = {
+    ".git", ".jac", "node_modules", "__pycache__", ".venv", "venv",
+    "dist", "build", ".pytest_cache", ".mypy_cache", ".idea", ".vscode"
+};
 
-`--others --exclude-standard` means a freshly-added source file shows up
-immediately while node_modules / .jac build output stay excluded."""
-@lru_cache(maxsize=1)
-def _git_files() -> tuple {
-    rels: list = [];
+# NOTE: the per-tree parameter is `base_dir`, never `root` -- `root` is a
+# reserved Jac keyword (the graph root) and using it as a param name ICEs the
+# compiler (PyastGenPass "Empty py_ast on ParamVar"). See jaseci-labs#7010.
+"""Candidate paths relative to `base_dir`. Prefer git (so `.gitignore` is
+honored in dev and freshly-added files show up via `--others`); fall back to a
+filesystem walk when git is unavailable -- e.g. a deploy pod that ships the
+source tree without a `.git` dir or the `git` binary. Without the fallback the
+source viewer lists nothing in-cluster while working locally."""
+def _raw_files(base_dir: str) -> list {
+    git_rels: list = [];
     try {
         out = subprocess.run(
             ["git", "ls-files", "--cached", "--others", "--exclude-standard"],
-            cwd=ROOT, capture_output=True, text=True, timeout=15
+            cwd=base_dir, capture_output=True, text=True, timeout=15
         );
-        rels = out.stdout.splitlines();
+        git_rels = [r.strip() for r in out.stdout.splitlines() if r.strip()];
     } except Exception {
-        rels = [];
+        git_rels = [];
     }
+    if git_rels {
+        return git_rels;
+    }
+    rels: list = [];
+    for (dirpath, dirnames, filenames) in os.walk(base_dir) {
+        dirnames[:] = [
+            d for d in dirnames if (d not in _SKIP_DIRS) and (not d.startswith("."))
+        ];
+        for fn in filenames {
+            rels.append(os.path.relpath(os.path.join(dirpath, fn), base_dir));
+        }
+    }
+    return rels;
+}
+
+"""Viewable source files relative to `base_dir`, filtered + sorted. Cached per-dir."""
+@lru_cache(maxsize=8)
+def _source_files(base_dir: str) -> tuple {
     keep: list = [];
-    for raw in rels {
+    for raw in _raw_files(base_dir) {
         rel = raw.strip();
         if not rel {
             continue;
@@ -91,7 +120,7 @@ def _git_files() -> tuple {
         if ext in _BINARY_EXTS {
             continue;
         }
-        if not os.path.isfile(os.path.join(ROOT, rel)) {
+        if not os.path.isfile(os.path.join(base_dir, rel)) {
             continue;
         }
         keep.append(rel);
@@ -100,11 +129,12 @@ def _git_files() -> tuple {
 }
 
 """Flat, sorted list of viewable source files with light metadata."""
-def list_files() -> list {
+def list_files(base_dir: str = "") -> list {
+    base = base_dir or ROOT;
     files: list = [];
-    for rel in _git_files() {
+    for rel in _source_files(base) {
         try {
-            size = os.path.getsize(os.path.join(ROOT, rel));
+            size = os.path.getsize(os.path.join(base, rel));
         } except OSError {
             continue;
         }
@@ -128,13 +158,14 @@ def _blank(rel: str, err: str) -> dict {
 }
 
 """Read + highlight one file. Sandboxed to the repo's own file set."""
-def get_file(rel: str) -> dict {
+def get_file(rel: str, base_dir: str = "") -> dict {
+    base = base_dir or ROOT;
     path = rel.lstrip("/").replace("\\", "/");
-    if path not in _git_files() {
+    if path not in _source_files(base) {
         return _blank(path, "File not found.");
     }
-    full = os.path.realpath(os.path.join(ROOT, path));
-    if os.path.commonpath([full, os.path.realpath(ROOT)]) != os.path.realpath(ROOT) {
+    full = os.path.realpath(os.path.join(base, path));
+    if os.path.commonpath([full, os.path.realpath(base)]) != os.path.realpath(base) {
         return _blank(path, "Invalid path.");
     }
     try {

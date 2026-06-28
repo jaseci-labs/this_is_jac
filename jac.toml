@@ -21,6 +21,14 @@ menuColor = "default"
 plugins = ["tailwindcss()"]
 lib_imports = ["import tailwindcss from '@tailwindcss/vite'"]
 
+[plugins.client.app_meta_data]
+title = "This is Jac"
+description = "One language for the graph, the server, the browser, and the metal. A live tour of Jac."
+keywords = "jac jaseci fullstack object-spatial walkers native wasm byllm"
+author = "Jaseci Labs"
+theme_color = "#f97316"
+icon = "/static/assets/jac-logo.svg"
+
 [dependencies.npm]
 "@fontsource-variable/figtree" = "*"
 "@tailwindcss/vite" = "^4.1.17"
@@ -41,6 +49,7 @@ react-error-boundary = "^5.0.0"
 react-hook-form = "^7.71.0"
 zod = "^4.3.6"
 "@hookform/resolvers" = "^5.2.2"
+"@tanstack/react-form" = "^1.33.0"
 
 [dependencies.npm.dev]
 vite = "^6.4.1"
@@ -51,11 +60,3 @@ typescript = "^5.3.3"
 
 [serve]
 base_route_app = "app"
-
-[plugins.client.app_meta_data]
-title = "This is Jac"
-description = "One language for the graph, the server, the browser, and the metal. A live tour of Jac."
-keywords = "jac jaseci fullstack object-spatial walkers native wasm byllm"
-author = "Jaseci Labs"
-theme_color = "#f97316"
-icon = "/static/assets/jac-logo.svg"
