@@ -6,6 +6,8 @@ the libc/__multi3 the Jac native runtime needs, instantiates /static/<name>.wasm
 and drives init()/frame() per requestAnimationFrame. Lives in a .cl.jac so it is
 compiled (not strictly type-checked) like other client deps."""
 
+import from "@jac/wasm_host" { instantiate_na_wasm }
+
 obj Shim {
     has gl: any = None,
         canvas: any = None,
@@ -456,13 +458,9 @@ async def:pub run_game(canvas: any, on_tick: any = None) {
     sh.mv = _m_ident();
     _init_gl(sh);
     _install_input(sh);
-    env = {"env": _build_env(sh)};
-    res: any = await WebAssembly.instantiateStreaming(fetch("/static/main.wasm"), env);
-    inst: any = res.instance;
-    sh.exports = inst.exports;
-    sh.mem = inst.exports.memory;
-    sh.heap = inst.exports.__heap_base.value;
-    inst.exports.__jac_glob_init();
+    inst: any = await instantiate_na_wasm(
+        "/static/main.wasm", sh, {"env": _build_env(sh)}
+    );
     inst.exports.init();
     requestAnimationFrame(lambda ts: float { _frame_tick(sh, ts); });
 }
