@@ -17,11 +17,11 @@ radius = "large"
 menuAccent = "subtle"
 menuColor = "default"
 
-[plugins.client.vite]
+[client.vite]
 plugins = ["tailwindcss()"]
 lib_imports = ["import tailwindcss from '@tailwindcss/vite'"]
 
-[plugins.client.app_meta_data]
+[client.app_meta_data]
 title = "This is Jac"
 description = "One language for the graph, the server, the browser, and the metal. A live tour of Jac."
 keywords = "jac jaseci fullstack object-spatial walkers native wasm byllm"
