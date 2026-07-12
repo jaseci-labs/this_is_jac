@@ -80,7 +80,7 @@ def:pub FullstackSection(
                                     placeholder="Your name"
                                     value={name}
                                     maxLength={40}
-                                    onChange={lambda e: ChangeEvent { onNameChange(
+                                    onChange={lambda (e: ChangeEvent) { onNameChange(
                                         e.target.value
                                     ); }}
                                 />
@@ -90,7 +90,7 @@ def:pub FullstackSection(
                                     rows={2}
                                     maxLength={200}
                                     className="resize-none"
-                                    onChange={lambda e: ChangeEvent { onMessageChange(
+                                    onChange={lambda (e: ChangeEvent) { onMessageChange(
                                         e.target.value
                                     ); }}
                                 />

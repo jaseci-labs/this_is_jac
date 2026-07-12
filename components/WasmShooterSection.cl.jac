@@ -16,7 +16,7 @@ def:pub WasmShooterSection -> JsxElement {
         canvas: any = document.getElementById("tij-glcanvas");
         run_game(
             canvas,
-            lambda exports: any , fps: int {
+            lambda (exports: any , fps: int) {
                 score_el: any = document.getElementById("tij-hud-score");
                 fps_el: any = document.getElementById("tij-hud-fps");
                 if score_el {
