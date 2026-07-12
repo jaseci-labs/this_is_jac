@@ -109,7 +109,7 @@ def:pub SourceViewer(
         }
     }
 
-    toggleDir = lambda d: str {
+    toggleDir = lambda (d: str) {
         nc = {**collapsed};
         nc[d] = not collapsed.get(d, False);
         collapsed = nc;
@@ -150,7 +150,7 @@ def:pub SourceViewer(
                             />
                             <input
                                 value={query}
-                                onChange={lambda e: ChangeEvent { query = e.target.value; }}
+                                onChange={lambda (e: ChangeEvent) { query = e.target.value; }}
                                 placeholder="Filter files..."
                                 className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
                             />

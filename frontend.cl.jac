@@ -94,8 +94,8 @@ def:pub Showcase -> JsxElement {
                     entries={guestbook}
                     name={gbName}
                     message={gbMessage}
-                    onNameChange={lambda v: str { gbName = v; }}
-                    onMessageChange={lambda v: str { gbMessage = v; }}
+                    onNameChange={lambda (v: str) { gbName = v; }}
+                    onMessageChange={lambda (v: str) { gbMessage = v; }}
                     onSign={signGuestbook}
                     signing={gbSigning}
                     graphRefresh={graphNonce}

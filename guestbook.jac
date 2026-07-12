@@ -142,7 +142,7 @@ walker:pub get_guestbook {
     }
 
     can deliver with Root exit {
-        self.results.sort(key=lambda e: GuestEntry : e.created_at, reverse=True);
+        self.results.sort(key=lambda (e: GuestEntry) { e.created_at; }, reverse=True);
         report self.results[:50];
     }
 }
