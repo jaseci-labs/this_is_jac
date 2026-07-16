@@ -8,7 +8,7 @@ live in `frontend.impl.jac`.
 """
 
 sv import from .guestbook { sign_guestbook, get_guestbook, guestbook_stats }
-sv import from .guestbook { GuestEntry }
+sv import from .guestbook { explore_graph, GuestEntry, GraphSnapshot }
 sv import from .source_viewer { list_source_files, get_source_file }
 
 import from .components.Nav { Nav }
@@ -53,6 +53,8 @@ def:pub Showcase -> JsxElement {
         gbMessage: str = "",
         gbSigning: bool = False,
         graphNonce: int = 0,
+        walkerSnap: GraphSnapshot | None = None,
+        exploring: bool = False,
         microStats: dict | None = None,
         microRunning: bool = False,
         story: str = "",
@@ -79,6 +81,7 @@ def:pub Showcase -> JsxElement {
 
     async def loadInitial -> None;
     async def signGuestbook -> None;
+    async def runExplore -> None;
     async def runStats -> None;
     async def loadSource -> None;
     async def openSource(path: str) -> None;
@@ -99,6 +102,9 @@ def:pub Showcase -> JsxElement {
                     onSign={signGuestbook}
                     signing={gbSigning}
                     graphRefresh={graphNonce}
+                    {walkerSnap}
+                    {exploring}
+                    onExplore={runExplore}
                 />
                 <MicroservicesSection
                     stats={microStats}

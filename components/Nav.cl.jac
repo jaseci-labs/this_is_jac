@@ -7,11 +7,12 @@ import from .ui.button { Button }
 
 glob _LINKS: list[dict] = [
     {"href": "#interop", "label": "Interop"},
+    {"href": "#littlex", "label": "littleX"},
     {"href": "#fullstack", "label": "Fullstack"},
-    {"href": "#ai", "label": "AI-native"},
+    {"href": "#microservices", "label": "Microservices"},
     {"href": "#native", "label": "Native"},
     {"href": "#wasm", "label": "WebAssembly"},
-    {"href": "#littlex", "label": "littleX"},
+    {"href": "#ai", "label": "AI-native"},
     {"href": "#source", "label": "Source"},
     {"href": "#seams", "label": "Cohesion"}
 ];

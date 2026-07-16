@@ -101,7 +101,7 @@ def:pub RightSidebar(
                                             u.username.split("@")[0]
                                                 if "@" in u.username
                                                 else u.username
-                                        )[0].upper()}
+                                        )[0].upper() if u.username else "?"}
                                     </AvatarFallback>
                                 </Avatar>
                                 <div className="min-w-0 flex-1">
@@ -127,7 +127,7 @@ def:pub RightSidebar(
                                                             u.username.split("@")[0]
                                                                 if "@" in u.username
                                                                 else u.username
-                                                        )[0].upper()}
+                                                        )[0].upper() if u.username else "?"}
                                                     </AvatarFallback>
                                                 </Avatar>
                                                 <div className="min-w-0">

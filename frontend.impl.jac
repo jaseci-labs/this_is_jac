@@ -23,6 +23,13 @@ impl Showcase.signGuestbook -> None {
     graphNonce += 1;
 }
 
+impl Showcase.runExplore -> None {
+    exploring = True;
+    w = root spawn explore_graph();
+    walkerSnap = w.reports[0] if w.reports else None;
+    exploring = False;
+}
+
 impl Showcase.runStats -> None {
     microRunning = True;
     story = "";

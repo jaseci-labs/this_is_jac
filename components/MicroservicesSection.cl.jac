@@ -18,7 +18,7 @@ def:pub guestbook_stats() -> dict {
     rep = analyze(count_signatures());      # -> SEPARATE service
     return {
         "gateway_pid": os.getpid(),         # this server
-        "analytics_pid": rep.pid,           # the analytics microservce
+        "analytics_pid": rep.pid,           # the analytics microservice
         "score": rep.score                  # typed, end to end
     };
 }
@@ -88,7 +88,7 @@ def:pub MicroservicesSection(
             id="microservices"
             eyebrow="Microservices"
             title="One import is a Microservice boundary"
-            subtitle="One relative `sv import from .analytics`, specifies a microservice. Done. Typechecked acrross. The runtime spawns analytics as its own service and routes the call - The compiler generate HTTP APIs, serializers, service URL, etc. This is real, Click the button. Watch the same import STREAM, and the analytics commentary arrives word by word over SSE."
+            subtitle="One relative `sv import from .analytics` specifies a microservice. Done. Typechecked across. The runtime spawns analytics as its own service and routes the call - the compiler generates HTTP APIs, serializers, service URLs, etc. This is real. Click the button. Watch the same import STREAM, and the analytics commentary arrives word by word over SSE."
         >
             <div className="mx-auto max-w-5xl">
                 <div className="grid items-stretch gap-4 lg:grid-cols-2">

@@ -4,7 +4,13 @@ A reusable client library (the moral equivalent of raylib for the browser):
 it emulates the scalar rlgl immediate-mode API + input on WebGL/DOM, supplies
 the libc/__multi3 the Jac native runtime needs, instantiates /static/<name>.wasm,
 and drives init()/frame() per requestAnimationFrame. Lives in a .cl.jac so it is
-compiled (not strictly type-checked) like other client deps."""
+compiled (not strictly type-checked) like other client deps.
+
+The host-ABI surface (console write, abort) is the versioned jac_host1
+contract supplied by @jac/wasm_host; this shim supplies only the game's own
+raylib FFI (plus its legacy libc stubs under env)."""
+
+import from "@jac/wasm_host" { instantiate_na_wasm }
 
 obj Shim {
     has gl: any = None,
@@ -456,13 +462,11 @@ async def:pub run_game(canvas: any, on_tick: any = None) {
     sh.mv = _m_ident();
     _init_gl(sh);
     _install_input(sh);
-    env = {"env": _build_env(sh)};
-    res: any = await WebAssembly.instantiateStreaming(fetch("/static/main.wasm"), env);
-    inst: any = res.instance;
-    sh.exports = inst.exports;
-    sh.mem = inst.exports.memory;
-    sh.heap = inst.exports.__heap_base.value;
-    inst.exports.__jac_glob_init();
+    # jac_host1 (console/os/time host surface) comes from the runtime; this
+    # shim supplies only the game's raylib externs (and legacy libc stubs).
+    inst: any = await instantiate_na_wasm(
+        "/static/main.wasm", sh, {"env": _build_env(sh)}
+    );
     inst.exports.init();
     requestAnimationFrame(lambda (ts: float) { _frame_tick(sh, ts); });
 }

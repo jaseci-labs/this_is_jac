@@ -202,7 +202,7 @@ def:pub TweetCard(
                                         alt={c["username"]}
                                     />
                                     <AvatarFallback className="text-[0.6rem]">
-                                        {c["username"][0].upper()}
+                                        {c["username"][0].upper() if c["username"] else "?"}
                                     </AvatarFallback>
                                 </Avatar>
                                 <div

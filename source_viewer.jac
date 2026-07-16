@@ -3,7 +3,7 @@
 The whole showcase is written in Jac; this module lets the site show its OWN
 source. Two `def:pub` endpoints (reachable from the browser as RPCs, exactly
 like the guestbook walkers) enumerate the repo's source files and highlight any
-one on demand. Highlighting runs server-side through `source_index.py`, which
+one on demand. Highlighting runs server-side through `source_index.jac`, which
 uses Jac's *own* canonical Pygments lexer - so the `.jac` you read here is
 coloured by the same grammar the official docs use. The client just renders the
 returned HTML.
