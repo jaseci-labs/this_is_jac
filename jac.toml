@@ -1,3 +1,6 @@
+[dev]
+jaclang_source = "../../jac"
+
 [project]
 name = "this-is-jac"
 version = "1.0.0"
