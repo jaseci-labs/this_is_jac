@@ -346,7 +346,6 @@ hardware allows (call `SetTargetFPS` yourself if you want to limit it)."""
 
     """Uniform pseudo-random float in [0, 1) via a 31-bit LCG."""
     def rand01 -> float {
-        global rng;
         rng = (rng * 1103515245 + 12345) % 2147483648;
         return float(rng) / 2147483648.0;
     }
@@ -394,7 +393,6 @@ hardware allows (call `SetTargetFPS` yourself if you want to limit it)."""
 
     """Advance bullets, resolve hits against targets, and tally score."""
     def update_bullets(bullets: list[Bullet], targets: list[Target], step: float) {
-        global score;
         bi = 0;
         while bi < len(bullets) {
             b = bullets[bi];
@@ -426,7 +424,6 @@ hardware allows (call `SetTargetFPS` yourself if you want to limit it)."""
 
     """Read keyboard + mouse and update camera orientation + position this frame."""
     def handle_input(step: float) {
-        global yaw,pitch,px,pz,prev_mx,prev_my,mouse_warmup,mouse_captured;
         turn = 90.0 * step;
 
         if key_tapped(KEY_TAB) {
@@ -512,7 +509,6 @@ hardware allows (call `SetTargetFPS` yourself if you want to limit it)."""
     # ─── Browser entry points (replace the native `with entry` loop) ─────────────
     """Set up the window and object pools. Call once before the first frame()."""
     def init {
-        global targets,bullets;
         open_window(960, 600, "Jac Cube Shooter");
         for n in range(7) {
             t = Target(x=0.0, y=0.0, z=0.0, base_y=0.0, phase=0.0, alive=False);
@@ -528,7 +524,6 @@ hardware allows (call `SetTargetFPS` yourself if you want to limit it)."""
 
     """Advance and render one frame. Returns True when the game wants to close."""
     def frame -> bool {
-        global world_t,fire_cd;
         step = dt();
         world_t += step;
         handle_input(step);
