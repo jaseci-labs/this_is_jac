@@ -13,7 +13,7 @@ import from .ui.badge { Badge }
 import from .CodeBlock { CodeBlock }
 import from .GraphView { GraphView }
 import from .SectionShell { SectionShell }
-sv import from ..guestbook { GuestEntry, GraphSnapshot }
+sv import from ..guestbook { Visitor, GraphSnapshot }
 
 glob _CODE: str = """# Signatures are grouped by date: root.shared -> Day -> Visitor,
 # all real graph data, not a fixture. `root.shared` is the public
@@ -87,7 +87,7 @@ def _nfill(kind: str) -> str {
 }
 
 def:pub FullstackSection(
-    entries: list[GuestEntry],
+    entries: list[Visitor],
     name: str,
     message: str,
     onNameChange: Callable[[str], None],
@@ -166,7 +166,7 @@ def:pub FullstackSection(
                                     </div>
                                 }}
                                 {[
-                                    <div className="tij-fade-up flex gap-3" key={e.id}>
+                                    <div className="tij-fade-up flex gap-3" key={jid(e)}>
                                         <Avatar className="size-9 shrink-0">
                                             <AvatarFallback
                                                 className="bg-primary/15 text-sm text-primary"

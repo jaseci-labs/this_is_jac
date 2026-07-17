@@ -67,7 +67,9 @@ impl Showcase.runStats -> None {
                 for frame in frames {
                     for line in frame.split(nl) {
                         if line.startswith("data: ") and not frame.startswith("event:") {
-                            acc = acc + JSON.parse(line[6:]);
+                            # Each data frame is a JSON-encoded str chunk from
+                            # guestbook_story; str() pins the type for the checker.
+                            acc = acc + str(JSON.parse(line[6:]));
                             story = acc;
                         }
                     }

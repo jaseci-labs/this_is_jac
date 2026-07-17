@@ -35,14 +35,8 @@ def _today -> str {
     return datetime.datetime.now(datetime.UTC).date().isoformat();
 }
 
-# ─── View models: the typed contract handed back to the client ───────────────
-obj GuestEntry {
-    has id: str,
-        name: str,
-        message: str,
-        created_at: str;
-}
-
+# ─── Traversal snapshot: the topology payload the OSP viz draws. Node ids
+#     here are jids - the walker records identity, it does not copy data. ───
 obj GraphNodeView {
     has id: str,
         label: str,
@@ -65,7 +59,8 @@ edge Signed {}  # Day -> Visitor
 
 
 
-# ─── Nodes: data plus the method that presents it as a view ──────────────────
+# ─── Nodes: pure data. Walkers report these directly - a node's identity
+#     is its jid and travels with it across the wire. ────────────────────────
 # Signatures are grouped under the day they were signed.
 node Day {
     has date: str = "";
@@ -75,22 +70,13 @@ node Visitor {
     has name: str = "",
         message: str = "",
         created_at: str = "";
-
-    def to_view -> GuestEntry {
-        return GuestEntry(
-            id=jid(self),
-            name=self.name,
-            message=self.message,
-            created_at=self.created_at
-        );
-    }
 }
 
 # ─── Guestbook walkers ───────────────────────────────────────────────────────
 walker:pub sign_guestbook {
     has name: str = "",
         message: str = "",
-        reports: list[GuestEntry] = [];
+        reports: list[Visitor] = [];
 
     can run with Root entry {
         if not self.message.strip() {
@@ -119,13 +105,13 @@ walker:pub sign_guestbook {
         # A signature is a leaf: everyone may read it, only its author
         # (and the walkers the author runs) may change it.
         grant(fresh, level=ReadPerm);
-        report fresh.to_view();
+        report fresh;
     }
 }
 
 walker:pub get_guestbook {
-    has results: list[GuestEntry] = [],
-        reports: list[list[GuestEntry]] = [];
+    has results: list[Visitor] = [],
+        reports: list[list[Visitor]] = [];
 
     can run with Root entry {
         # One graph, one walk: every signature lives under `root.shared`,
@@ -138,11 +124,11 @@ walker:pub get_guestbook {
     }
 
     can gather with Visitor entry {
-        self.results.append(here.to_view());
+        self.results.append(here);
     }
 
     can deliver with Root exit {
-        self.results.sort(key=lambda (e: GuestEntry) { e.created_at; }, reverse=True);
+        self.results.sort(key=lambda (e: Visitor) { e.created_at; }, reverse=True);
         report self.results[:50];
     }
 }

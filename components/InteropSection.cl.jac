@@ -37,7 +37,7 @@ import from "libm.so.6" {
     def sqrt(x: f64) -> f64;
 }""";
 
-glob _JAC_CODE: str = """import from .guestbook { GuestEntry }
+glob _JAC_CODE: str = """import from .guestbook { Visitor }
 import from .components.Nav { Nav }
 sv import from .analytics { analyze }""";
 

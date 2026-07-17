@@ -8,7 +8,7 @@ live in `frontend.impl.jac`.
 """
 
 sv import from .guestbook { sign_guestbook, get_guestbook, guestbook_stats }
-sv import from .guestbook { explore_graph, GuestEntry, GraphSnapshot }
+sv import from .guestbook { explore_graph, Visitor, GraphSnapshot }
 sv import from .source_viewer { list_source_files, get_source_file }
 
 import from .components.Nav { Nav }
@@ -48,7 +48,7 @@ def:pub app -> JsxElement {
 
 def:pub Showcase -> JsxElement {
     has darkMode: bool = True,
-        guestbook: list[GuestEntry] = [],
+        guestbook: list[Visitor] = [],
         gbName: str = "",
         gbMessage: str = "",
         gbSigning: bool = False,
