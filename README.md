@@ -12,7 +12,7 @@ Everything here is built in Jac. The live demos really run.
 ## What it shows
 
 Each section is its own component under [`components/`](components/), composed by
-[`frontend.cl.jac`](frontend.cl.jac):
+[`frontend.jac`](frontend.jac):
 
 | Section | Capability | Live? |
 | ------- | ---------- | ----- |
@@ -28,7 +28,7 @@ Each section is its own component under [`components/`](components/), composed b
 
 The same `na {}` cube-shooter game lives in [`main.jac`](main.jac): the client
 build compiles it to `/static/main.wasm`, and the WebAssembly section renders it
-live through [`raylib_shim.cl.jac`](raylib_shim.cl.jac) - byte-for-byte the rlgl
+live through [`raylib_shim.jac`](raylib_shim.jac) - byte-for-byte the rlgl
 pipeline from the bundled [`raylib_shooter/`](raylib_shooter) example.
 
 ## Run it
@@ -48,12 +48,12 @@ and launch the in-browser shooter - all of it hits real Jac.
 
 ```
 main.jac              cl{} app delegate + na{} rlgl shooter (-> main.wasm)
-frontend.cl.jac       app shell: shared state, section order, sv handler decls
+frontend.jac       app shell: shared state, section order, sv handler decls
 frontend.impl.jac     handler bodies (root spawn ... walkers)
 guestbook.jac         object-spatial backend: Day/Visitor nodes, walkers
 analytics.jac         the analytics microservice (sv-imported by guestbook.jac)
 source_viewer.jac     source-browser endpoints (uses source_index.jac + source_lexer.jac)
-raylib_shim.cl.jac    WebGL/DOM shim for the wasm shooter
+raylib_shim.jac    WebGL/DOM shim for the wasm shooter
 capture.jac           the automation script (below)
 components/           Nav, SectionShell, CodeBlock, StatBar + one file per section
 components/ui/         shadcn primitives (button, card, badge, ...)

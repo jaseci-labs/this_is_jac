@@ -85,7 +85,7 @@ impl Showcase.runStats -> None {
 impl Showcase.loadSource -> None {
     srcFiles = await list_source_files();
     srcLoading = True;
-    srcFile = await get_source_file("frontend.cl.jac");
+    srcFile = await get_source_file("frontend.jac");
     srcLoading = False;
 }
 

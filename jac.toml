@@ -4,6 +4,12 @@ version = "1.0.0"
 description = "This is Jac - a scroll-driven showcase of Jac's fullstack, object-spatial, AI-native, and native-compilation capabilities"
 entry-point = "main.jac"
 
+# Editable dev loop: reroute `import jaclang` to the in-repo source under
+# ~/repos/j1/jac so the `jac` binary runs the latest compiler edits with no
+# rebuild. Comment this stanza out to fall back to the binary's bundled jaclang.
+[dev]
+jaclang_source = "../../jac"   # dir CONTAINING jaclang/, relative to this file
+
 [jacpack]
 name = "this-is-jac"
 description = "This is Jac showcase site template"

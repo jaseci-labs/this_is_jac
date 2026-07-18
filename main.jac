@@ -1,10 +1,11 @@
 """This is Jac - entry point.
 
-One module, three worlds:
-  - `cl {}` mounts the React showcase (delegated to `frontend`).
+One module, three worlds, zero placement markers for the client side:
+  - `app` mounts the React showcase (delegated to `frontend`); the compiler
+    infers its client codespace from the JSX it returns.
   - `na {}` is the SAME rlgl cube shooter as `raylib_shooter/`, compiled to
     `/static/main.wasm` by the client build and rendered live in the browser by
-    `WasmShooterSection` via the WebGL shim in `raylib_shim.cl.jac`.
+    `WasmShooterSection` via the WebGL shim in `raylib_shim.jac`.
   - `guestbook.jac` (imported by the frontend with `sv import`) is the live
     object-spatial backend behind the guestbook + graph-traversal demos.
 """
@@ -14,12 +15,10 @@ One module, three worlds:
 # the top level of the entry module.
 import from guestbook { guestbook_story }
 
-cl {
-    import from .frontend { app as ClientApp }
+import from .frontend { app as ClientApp }
 
-    def:pub app -> JsxElement {
-        return <ClientApp/>;
-    }
+def:pub app -> JsxElement {
+    return <ClientApp/>;
 }
 
 # ─── The native game: rlgl immediate-mode cube shooter, compiled to wasm. ──────

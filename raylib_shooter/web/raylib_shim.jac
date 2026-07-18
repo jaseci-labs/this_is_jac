@@ -3,8 +3,8 @@
 A reusable client library (the moral equivalent of raylib for the browser):
 it emulates the scalar rlgl immediate-mode API + input on WebGL/DOM, supplies
 the libc/__multi3 the Jac native runtime needs, instantiates /static/<name>.wasm,
-and drives init()/frame() per requestAnimationFrame. Lives in a .cl.jac so it is
-compiled (not strictly type-checked) like other client deps.
+and drives init()/frame() per requestAnimationFrame. Its client codespace is
+inferred from its npm import and DOM usage - no marker needed.
 
 The host-ABI surface (console write, abort) is the versioned jac_host1
 contract supplied by @jac/wasm_host; this shim supplies only the game's own

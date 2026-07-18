@@ -23,7 +23,7 @@ main.jac
   cl { import from .raylib_shim { run_game };  def:pub app -> JsxElement { <canvas/> } }
         -> React bundle; on mount calls run_game(canvas)
 
-raylib_shim.cl.jac   (reusable client library)
+raylib_shim.jac   (reusable client library)
   emulates raylib's scalar rlgl immediate-mode API + input on WebGL/DOM,
   supplies the libc/__multi3 the Jac native runtime needs, instantiates
   /static/main.wasm, and drives init()/frame() per requestAnimationFrame.
@@ -33,13 +33,14 @@ The `na` block's `import from raylib { ... }` externs do **not** link a native
 library here - they become the wasm module's **imports**, which `raylib_shim`
 satisfies. Same source contract as the native build; a different host fulfills it.
 
-### Why the shim is a separate `.cl.jac`
+### Why the shim is a separate module
 
 The shim is generic browser infra (a WebGL/DOM raylib emulation), not app code -
-so it lives in a reusable `cl` library, imported like `react`. It is also where
-the low-level glue (typed-array/`BigInt` marshalling, bitwise allocator math)
-lives; a `.cl.jac` library is compiled but not strictly type-checked, which that
-glue currently needs. The game and the page stay in `main.jac`.
+so it lives in a reusable library, imported like `react`. No `cl` marker is
+needed: the compiler infers its client codespace from its npm import and DOM
+usage, and client code is compiled but not strictly type-checked, which the
+low-level glue (typed-array/`BigInt` marshalling, bitwise allocator math)
+currently needs. The game and the page stay in `main.jac`.
 
 ## What's a shim vs. real raylib
 
@@ -52,6 +53,6 @@ This renders with a hand-written WebGL emulation of the rlgl subset the game use
 | File | Role |
 |------|------|
 | `main.jac` | `na {}` game (-> `main.wasm`) + `cl {}` page that mounts the canvas |
-| `raylib_shim.cl.jac` | WebGL/DOM shim: rlgl + input + libc -> the wasm's `env` imports |
+| `raylib_shim.jac` | WebGL/DOM shim: rlgl + input + libc -> the wasm's `env` imports |
 | `jac.toml` | project + `[plugins.client]` + react deps |
 | `.jac/client/dist/` | build output (git-ignored): `client.*.js` + `main.wasm` |

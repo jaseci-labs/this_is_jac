@@ -1,6 +1,6 @@
 """The native section's twin: the SAME `na {}` rlgl shooter from `main.jac`,
 compiled to `/static/main.wasm` by the client build and run live in the browser
-on a WebGL canvas via the shim in `raylib_shim.cl.jac`. Click to load the wasm
+on a WebGL canvas via the shim in `raylib_shim.jac`. Click to load the wasm
 module and play - no plugin, no install."""
 
 import from "lucide-react" { Play, Gamepad2 }
