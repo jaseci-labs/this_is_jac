@@ -1,6 +1,6 @@
 """raylib cube shooter benchmark - pure-Jac orchestration (replaces demo.sh).
 
-Builds the Jac-native shooter (`jac nacompile shooter.na.jac`) and, on demand, a
+Builds the Jac-native shooter (`jac nacompile shooter.jac`) and, on demand, a
 Zig twin - downloading the Zig *source* from the jaseci repo plus the Zig
 toolchain and precompiled raylib into a git-ignored `.build/` cache - then runs
 each for a fixed number of seconds and reports avg/max FPS. No shell scripts and
@@ -156,10 +156,10 @@ def ensure_raylib(info: dict[str, str]) -> None {
     _log("staged raylib shared library set -> ./");
 }
 
-"""Compile shooter.na.jac -> ./shooter with `jac nacompile` (no cc/ld)."""
+"""Compile shooter.jac -> ./shooter with `jac nacompile` (no cc/ld)."""
 def build_jac -> str {
-    _log("compiling: jac nacompile shooter.na.jac");
-    r = subprocess.run([_jac_exe(), "nacompile", "shooter.na.jac"], cwd=HERE);
+    _log("compiling: jac nacompile shooter.jac");
+    r = subprocess.run([_jac_exe(), "nacompile", "shooter.jac"], cwd=HERE);
     if r.returncode != 0 {
         raise RuntimeError("jac nacompile failed (exit " + str(r.returncode) + ")");
     }

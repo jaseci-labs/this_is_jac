@@ -6,7 +6,7 @@ in Jac - there is **no shell script and no committed Zig source** in this repo.
 
 | File | Role |
 | ---- | ---- |
-| `shooter.na.jac` | the game: raylib FFI bindings + the scalar `rlgl` render loop, compiled to a native binary by `jac nacompile` (pure-Python linker, no `cc`/`ld`). Has two dormant paths gated by sentinel files: a benchmark (`.bench_seconds`) and a self-screenshot (`.screenshot` → raylib `TakeScreenshot`) |
+| `shooter.jac` | the game: raylib FFI bindings + the scalar `rlgl` render loop, compiled to a native binary by `jac nacompile` (pure-Python linker, no `cc`/`ld`). Has two dormant paths gated by sentinel files: a benchmark (`.bench_seconds`) and a self-screenshot (`.screenshot` → raylib `TakeScreenshot`) |
 | `bench.jac` | pure-Jac benchmark orchestrator (replaces the original `demo.sh`) |
 | `web/` | the same game as an `na{}`→WebAssembly + `cl{}` WebGL build (`jac start`) |
 
@@ -22,7 +22,7 @@ jac run bench.jac --seconds 5     # shorter run
 
 1. detects the platform and downloads the matching **precompiled raylib** release
    into a git-ignored `.build/` cache, staging the shared library beside the binary;
-2. builds the Jac shooter with `jac nacompile shooter.na.jac` → `./shooter`;
+2. builds the Jac shooter with `jac nacompile shooter.jac` → `./shooter`;
 3. for the conventional-toolchain baseline, **downloads the Zig twin's source on
    demand** from the jaseci repo and the **Zig toolchain** into `.build/`, then
    builds `./shooter_zig`. This leg is best-effort - if it fails, the Jac number

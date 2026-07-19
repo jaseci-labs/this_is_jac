@@ -20,7 +20,7 @@ import from raylib {
     def rlColor4ub(r: u8, g: u8, b: u8, a: u8) -> None;
 }
 
-# `jac nacompile shooter.na.jac` emits a standalone ELF/Mach-O.
+# `jac nacompile shooter.jac` emits a standalone ELF/Mach-O.
 # The linker is PURE PYTHON - there is no cc/ld invocation.""";
 
 def:pub NativeSection -> JsxElement {
@@ -71,7 +71,7 @@ def:pub NativeSection -> JsxElement {
             subtitle="A first-person shooter written in Jac, linked against precompiled raylib and built to a standalone binary - benchmarked head-to-head with a hand-written Zig twin doing identical work."
         >
             <div className="grid items-start gap-8 lg:grid-cols-2">
-                <CodeBlock code={_CODE} filename="shooter.na.jac"/>
+                <CodeBlock code={_CODE} filename="shooter.jac"/>
 
                 <Card className="border-border bg-card/60">
                     <CardContent className="flex flex-col gap-5 p-6">
