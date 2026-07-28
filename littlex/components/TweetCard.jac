@@ -17,7 +17,7 @@ import from .ui.alert_dialog {
     AlertDialogCancel
 }
 import from ..lib.utils { cn }
-sv import from ..social_graph { Tweet }
+import from ..social_graph { Tweet }
 
 def:pub TweetCard(
     tweet: Tweet,
@@ -205,7 +205,9 @@ def:pub TweetCard(
                                         alt={c["username"]}
                                     />
                                     <AvatarFallback className="text-[0.6rem]">
-                                        {c["username"][0].upper() if c["username"] else "?"}
+                                        {c["username"][0].upper()
+                                            if c["username"]
+                                            else "?"}
                                     </AvatarFallback>
                                 </Avatar>
                                 <div

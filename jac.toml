@@ -66,3 +66,9 @@ typescript = "^5.3.3"
 
 [serve]
 base_route_app = "app"
+
+[scale.microservices.routes]
+"analytics" = "/analytics"
+"guestbook" = "/guestbook"
+"social_graph" = "/social_graph"
+"source_viewer" = "/source_viewer"

@@ -25,7 +25,7 @@ import from typing { Generator }
 # browser (cl->sv); this relative `sv import` ALSO makes it a server->server
 # consumer. The runtime spawns `analytics` as its own process the first time
 # `analyze(...)` is called and routes to it.
-sv import from .analytics { analyze, AnalyticsReport, narrate }
+import from .analytics { analyze, AnalyticsReport, narrate }
 
 def _now -> str {
     return datetime.datetime.now(datetime.UTC).replace(tzinfo=None).isoformat() + "Z";
@@ -54,9 +54,7 @@ obj GraphSnapshot {
 edge OnDay {}  # root -> Day
 
 
-
 edge Signed {}  # Day -> Visitor
-
 
 
 # ─── Nodes: pure data. Walkers report these directly - a node's identity
@@ -87,8 +85,8 @@ walker:pub sign_guestbook {
         # Walk into today's Day node, creating it on the day's first sign. The
         # `else` fires when the visit enqueues nothing (no Day for today yet).
         today = _today();
-        visit [root.shared-->[?:Day, date == today]] else {
-            fresh_day = root.shared +>: OnDay() :+> Day(date=today);
+        visit [root.shared-->[?:Day, date==today]] else {
+            fresh_day = root.shared +>:OnDay():+> Day(date=today);
             # Day is a container: others attach their signatures under it.
             grant(fresh_day, level=ConnectPerm);
             visit fresh_day;
@@ -97,7 +95,7 @@ walker:pub sign_guestbook {
 
     can sign with Day entry {
         # Now standing on today's Day node - hang the signature off `here`.
-        fresh = here +>: Signed() :+> Visitor(
+        fresh = here +>:Signed():+> Visitor(
             name=self.name.strip()[:40] or "anonymous",
             message=self.message.strip()[:200],
             created_at=_now()

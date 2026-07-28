@@ -7,7 +7,7 @@ import from .ui.card { Card, CardHeader, CardTitle, CardContent }
 import from .ui.avatar { Avatar, AvatarImage, AvatarFallback }
 import from .ui.badge { Badge }
 import from .ui.hover_card { HoverCard, HoverCardTrigger, HoverCardContent }
-sv import from ..social_graph { Profile, TrendingTag }
+import from ..social_graph { Profile, TrendingTag }
 
 def:pub RightSidebar(
     searchQuery: str,
@@ -33,7 +33,9 @@ def:pub RightSidebar(
                     className="rounded-full bg-muted pl-9 pr-9"
                     placeholder="Search Little-X"
                     value={searchQuery}
-                    onChange={lambda (e: ChangeEvent) { onSearchChange(e.target.value); }}
+                    onChange={lambda (e: ChangeEvent) { onSearchChange(
+                        e.target.value
+                    ); }}
                     onKeyDown={lambda (e: KeyboardEvent) { if e.key == "Enter" {
                         onSearch(searchQuery);
                     }}}
@@ -101,7 +103,9 @@ def:pub RightSidebar(
                                             u.username.split("@")[0]
                                                 if "@" in u.username
                                                 else u.username
-                                        )[0].upper() if u.username else "?"}
+                                        )[0].upper()
+                                            if u.username
+                                            else "?"}
                                     </AvatarFallback>
                                 </Avatar>
                                 <div className="min-w-0 flex-1">
@@ -127,7 +131,9 @@ def:pub RightSidebar(
                                                             u.username.split("@")[0]
                                                                 if "@" in u.username
                                                                 else u.username
-                                                        )[0].upper() if u.username else "?"}
+                                                        )[0].upper()
+                                                            if u.username
+                                                            else "?"}
                                                     </AvatarFallback>
                                                 </Avatar>
                                                 <div className="min-w-0">

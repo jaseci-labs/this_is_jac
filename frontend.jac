@@ -7,9 +7,9 @@ the rest pair real Jac source with captured or in-browser demos. Handler bodies
 live in `frontend.impl.jac`.
 """
 
-sv import from .guestbook { sign_guestbook, get_guestbook, guestbook_stats }
-sv import from .guestbook { explore_graph, Visitor, GraphSnapshot }
-sv import from .source_viewer { list_source_files, get_source_file }
+import from .guestbook { sign_guestbook, get_guestbook, guestbook_stats }
+import from .guestbook { explore_graph, Visitor, GraphSnapshot }
+import from .source_viewer { list_source_files, get_source_file }
 
 import from .components.Nav { Nav }
 import from .components.HeroSection { HeroSection }

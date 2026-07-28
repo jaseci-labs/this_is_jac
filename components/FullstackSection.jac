@@ -13,7 +13,7 @@ import from .ui.badge { Badge }
 import from .CodeBlock { CodeBlock }
 import from .GraphView { GraphView }
 import from .SectionShell { SectionShell }
-sv import from ..guestbook { Visitor, GraphSnapshot }
+import from ..guestbook { Visitor, GraphSnapshot }
 
 glob _CODE: str = """# Signatures are grouped by date: root.shared -> Day -> Visitor,
 # all real graph data, not a fixture. `root.shared` is the public
@@ -166,7 +166,10 @@ def:pub FullstackSection(
                                     </div>
                                 }}
                                 {[
-                                    <div className="tij-fade-up flex gap-3" key={jid(e)}>
+                                    <div
+                                        className="tij-fade-up flex gap-3"
+                                        key={jid(e)}
+                                    >
                                         <Avatar className="size-9 shrink-0">
                                             <AvatarFallback
                                                 className="bg-primary/15 text-sm text-primary"
@@ -225,43 +228,69 @@ def:pub FullstackSection(
                                         {[
                                             <line
                                                 key={"e" + str(i)}
-                                                x1={ly["pos"][walkerSnap.edges[i][0]]["x"]}
-                                                y1={ly["pos"][walkerSnap.edges[i][0]]["y"]}
-                                                x2={ly["pos"][walkerSnap.edges[i][1]]["x"]}
-                                                y2={ly["pos"][walkerSnap.edges[i][1]]["y"]}
+                                                x1={ly["pos"][walkerSnap.edges[i][0]][
+                                                    "x"
+                                                ]}
+                                                y1={ly["pos"][walkerSnap.edges[i][0]][
+                                                    "y"
+                                                ]}
+                                                x2={ly["pos"][walkerSnap.edges[i][1]][
+                                                    "x"
+                                                ]}
+                                                y2={ly["pos"][walkerSnap.edges[i][1]][
+                                                    "y"
+                                                ]}
                                                 className="stroke-border"
                                                 strokeWidth={1.5}
                                             /> for i in range(len(walkerSnap.edges))
-                                        ]}
-                                        {[
+                                        ]}{[
                                             <g key={"n" + walkerSnap.nodes[i].id}>
                                                 <circle
-                                                    cx={ly["pos"][walkerSnap.nodes[i].id]["x"]}
-                                                    cy={ly["pos"][walkerSnap.nodes[i].id]["y"]}
-                                                    r={13 if walkerSnap.nodes[i].kind == "root" else 10}
-                                                    className={_nfill(walkerSnap.nodes[i].kind)}
+                                                    cx={ly["pos"][
+                                                        walkerSnap.nodes[i].id
+                                                    ]["x"]}
+                                                    cy={ly["pos"][
+                                                        walkerSnap.nodes[i].id
+                                                    ]["y"]}
+                                                    r={13
+                                                        if walkerSnap.nodes[i].kind == "root"
+                                                        else 10}
+                                                    className={_nfill(
+                                                        walkerSnap.nodes[i].kind
+                                                    )}
                                                 />
                                                 <text
-                                                    x={ly["pos"][walkerSnap.nodes[i].id]["x"]}
-                                                    y={ly["pos"][walkerSnap.nodes[i].id]["y"] + 26}
+                                                    x={ly["pos"][walkerSnap.nodes[i].id][
+                                                        "x"
+                                                    ]}
+                                                    y={ly["pos"][walkerSnap.nodes[i].id][
+                                                        "y"
+                                                    ] + 26}
                                                     textAnchor="middle"
                                                     className="fill-muted-foreground font-mono text-[10px]"
                                                 >
                                                     {walkerSnap.nodes[i].label[:14]}
                                                 </text>
                                             </g> for i in range(len(walkerSnap.nodes))
-                                        ]}
-                                        {[
+                                        ]}{[
                                             <g key={"p" + str(i)}>
                                                 <circle
-                                                    cx={ly["pos"][walkerSnap.path[i]]["x"] + 14}
-                                                    cy={ly["pos"][walkerSnap.path[i]]["y"] - 14}
+                                                    cx={ly["pos"][walkerSnap.path[i]][
+                                                        "x"
+                                                    ] + 14}
+                                                    cy={ly["pos"][walkerSnap.path[i]][
+                                                        "y"
+                                                    ] - 14}
                                                     r={8}
                                                     className="fill-primary"
                                                 />
                                                 <text
-                                                    x={ly["pos"][walkerSnap.path[i]]["x"] + 14}
-                                                    y={ly["pos"][walkerSnap.path[i]]["y"] - 11}
+                                                    x={ly["pos"][walkerSnap.path[i]][
+                                                        "x"
+                                                    ] + 14}
+                                                    y={ly["pos"][walkerSnap.path[i]][
+                                                        "y"
+                                                    ] - 11}
                                                     textAnchor="middle"
                                                     className="fill-primary-foreground text-[9px] font-bold"
                                                 >
@@ -285,8 +314,7 @@ def:pub FullstackSection(
                                 <div
                                     className="flex h-48 items-center justify-center rounded-lg border border-dashed border-border text-center text-sm text-muted-foreground"
                                 >
-                                    Spawn the walker to traverse the real graph -
-                                    root, each Day, every signature - in visit order.
+                                    Spawn the walker to traverse the real graph - root, each Day, every signature - in visit order.
                                 </div>
                             }}
                         </CardContent>
